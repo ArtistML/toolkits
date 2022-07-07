@@ -43,9 +43,10 @@ type ApiResource struct {
 
 var (
 	// Example:
-	// go run "github.com/artistml/toolkits/cmd/gen-proto" --host=github.com/artistml/toolkits
+	// go run "github.com/artistml/toolkits/cmd/gen-proto" --host=github.com/artistml/toolkits -f echo/v1 -f echo/v2
 	opts struct {
-		DefaultHost string `required:"true" long:"host" description:"Default host for whole proto." json:"DefaultHost"`
+		DefaultHost string   `required:"true" long:"host" description:"Default host for whole proto." json:"DefaultHost"`
+		Filters     []string `required:"false" short:"f" long:"filter" description:"Filter paths for generation." json:"Filters"`
 	}
 
 	optList = []Opt{}
@@ -112,17 +113,27 @@ func main() {
 	var pkgPaths []string
 	err = filepath.Walk(rootPath, func(walkPath string, info os.FileInfo, err error) error {
 		if info.IsDir() && path.Dir(path.Dir(walkPath)) == rootPath {
+			match := true
+			if len(opts.Filters) > 0 {
+				// 定义了 filter 的情况下只对包含某个 filter 的路径进行 service proto 生成
+				for _, subPath := range opts.Filters {
+					if !strings.Contains(walkPath, subPath) {
+						continue
+					}
+					match = false
+					break
+				}
+			}
+			if !match {
+				return nil
+			}
 			pkgPaths = append(pkgPaths, walkPath)
+
 		}
 		return nil
 	})
-	rootResource := readResource(path.Join(rootPath, "common_resources.proto"))
 	for _, pkgPath := range pkgPaths {
 		parentResource := readResource(path.Join(pkgPath, "common_resources.proto"))
-		if !strings.HasPrefix(parentResource.Pattern, rootResource.Pattern) {
-			fmt.Printf("Resource %s of parent should start with root's resource %s!\n", parentResource.Pattern, rootResource.Pattern)
-			os.Exit(1)
-		}
 		err = filepath.Walk(pkgPath, func(walkPath string, info os.FileInfo, err error) error {
 			if info.IsDir() {
 				return nil
