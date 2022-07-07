@@ -1,0 +1,85 @@
+package {{.PackageName}}
+
+import (
+	"context"
+	"fmt"
+	"net"
+	"net/http"
+	"time"
+
+	"github.com/gogf/gf/frame/g"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/leventeliu/goproc"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
+	{{range .Imports}}{{.}}
+	{{end}}
+	customGrpc "github.com/artistml/toolkits/pkg/lib/grpc"
+)
+
+// RunGateway loads config and runs gateway instances.
+func RunGateway(ctx context.Context) {
+	var serverConfigs []customGrpc.GatewayServerConfig
+	serverConfig, ok := ctx.Value(customGrpc.GatewayServerKey).(*customGrpc.GatewayServerConfig)
+	if ok {
+		serverConfigs = append(serverConfigs, *serverConfig)
+	} else {
+		err := g.Cfg().GetJson(customGrpc.GatewayServerKey).Structs(&serverConfigs)
+		if err != nil {
+			g.Log().Fatalf("failed to parse rpc server configs: %s", err)
+		}
+	}
+
+	ctrl := goproc.NewController(ctx, customGrpc.GatewayServerKey)
+	defer ctrl.Wait()
+	for i := range serverConfigs {
+		ctrl.WithValue("config", &serverConfigs[i]).Go(ServeGateway)
+	}
+}
+
+func ServeGateway(ctx context.Context) {
+	cfg := ctx.Value("config").(*customGrpc.GatewayServerConfig)
+	mux := runtime.NewServeMux()
+	defaultReceiveSize, defaultSendSize := customGrpc.GetReceiveAndSendMsgSize()
+	g.Log().Infof("defaultReceiveSize = %d, defaultSendSize = %d", defaultReceiveSize, defaultSendSize)
+	defaultServiceConfig := fmt.Sprintf("{\"method_config\":[{\"max_request_message_bytes\":%d,\"max_response_message_bytes\":%d}]}", defaultReceiveSize, defaultSendSize)
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(defaultReceiveSize), grpc.MaxCallSendMsgSize(defaultSendSize)),
+		grpc.WithDefaultServiceConfig(defaultServiceConfig),
+	}
+
+	g.Log().Infof("starting gateway server: name=%s address=%s grpc_endpoint=%s", cfg.Name, cfg.Address, cfg.GRPCEndpoint)
+	{{range .RegisterHandlerMethods}}if err := {{.}}HandlerFromEndpoint(ctx, mux, cfg.GRPCEndpoint, opts); err != nil {
+		g.Log().Fatalf("failed to register {{.}}HandlerFromEndpoint handler: name=%s error=%s", cfg.Name, err)
+	}
+	{{end}}
+	server := &http.Server{
+		Addr:    cfg.Address,
+		Handler: mux,
+	}
+	defer goproc.NewController(ctx, cfg.Name+"-watcher").Go(func(ctx context.Context) {
+		<-ctx.Done()
+		g.Log().Infof("get context notify: name=%s error=%s", cfg.Name, ctx.Err())
+		timeout, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		err := server.Shutdown(timeout)
+		if err != nil {
+			g.Log().Errorf("failed to shutdown gateway: name=%s error=%s", cfg.Name, err)
+		}
+	}).Wait()
+	// Listen and serve.
+	addr := server.Addr
+	if addr == "" {
+		addr = ":http"
+	}
+	ln, err := net.Listen("tcp", addr)
+	if err != nil {
+		g.Log().Fatalf("failed to listen gateway: name=%s error=%s", cfg.Name, err)
+	}
+	if err := server.Serve(ln); err != nil {
+		g.Log().Debugf("http gateway exiting with error: name=%s error=%s", cfg.Name, err)
+	}
+	g.Log().Infof("http gateway exited: name=%s", cfg.Name)
+}

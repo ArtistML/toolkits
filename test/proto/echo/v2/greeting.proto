@@ -1,0 +1,33 @@
+syntax = "proto3";
+package echo.v2;
+option go_package = "github.com/artistml/echo/v2;echoV2";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/resource.proto";
+
+
+message Greeting {
+  option (google.api.resource) = {
+    type: "github.com.artistml/Greeting"
+    pattern: "echos/greetings/{id}"
+  };
+  // auto increase id.
+  int64 id = 1 ;
+
+  // Output only. Timestamp when this Dataset was created.
+  google.protobuf.Timestamp create_time = 2;
+
+  // Output only. Timestamp when this Dataset was last updated.
+  google.protobuf.Timestamp update_time = 3;
+
+  string greeted = 4;
+}
+
+message GreetingFilter {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+}
+
+message ImportGreetingConfig {
+  string file_path = 1;
+}

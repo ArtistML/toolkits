@@ -1,0 +1,282 @@
+{{.EntityHeaders}}
+
+import "google/api/annotations.proto";
+import "google/api/client.proto";
+import "google/protobuf/field_mask.proto";
+
+import "{{.PackageName}}/v{{.PackageVersionNo}}/{{.EntityName}}.proto";
+
+// The service that handles the CRUD of {{.CapitalEntityName}}.
+service {{.CapitalEntityName}}Service {
+{{if .DefaultHost}}
+  option (google.api.default_host) = "{{.DefaultHost}}";
+{{end}}
+  // Creates a {{.CapitalEntityName}}.
+  rpc Create{{.CapitalEntityName}}(Create{{.CapitalEntityName}}Request) returns (Create{{.CapitalEntityName}}Response) {
+    option (google.api.http) = {
+      post: "/v{{.PackageVersionNo}}/{parent={{.ParentUri}}}/{{.EntityName}}s"
+      body: "{{.EntityName}}"
+    };
+    option (google.api.method_signature) = "parent,{{.EntityName}}";
+  }
+
+  // Gets a {{.CapitalEntityName}}.
+  rpc Get{{.CapitalEntityName}}(Get{{.CapitalEntityName}}Request) returns (Get{{.CapitalEntityName}}Response) {
+    option (google.api.http) = {
+      get: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s/{id=*}"
+    };
+    option (google.api.method_signature) = "id";
+  }
+
+  // Updates a {{.CapitalEntityName}}.
+  rpc Update{{.CapitalEntityName}}(Update{{.CapitalEntityName}}Request) returns (Update{{.CapitalEntityName}}Response) {
+    option (google.api.http) = {
+      patch: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s/{{.EntityIdExpr}}"
+      body: "{{.EntityName}}"
+    };
+    option (google.api.method_signature) = "{{.EntityName}},update_mask";
+  }
+
+  // Lists {{.CapitalEntityName}}s in a Location.
+  rpc List{{.CapitalEntityName}}s(List{{.CapitalEntityName}}sRequest) returns (List{{.CapitalEntityName}}sResponse) {
+    option (google.api.http) = {
+      get: "/v{{.PackageVersionNo}}/{parent={{.ParentUri}}}/{{.EntityName}}s"
+    };
+    option (google.api.method_signature) = "parent";
+  }
+
+  // Deletes a {{.CapitalEntityName}}.
+  rpc Delete{{.CapitalEntityName}}(Delete{{.CapitalEntityName}}Request) returns (Delete{{.CapitalEntityName}}Response) {
+    option (google.api.http) = {
+      delete: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s/{id=*}"
+    };
+    option (google.api.method_signature) = "id";
+  }
+
+  // Batch delete {{.CapitalEntityName}} by filter.
+  rpc Delete{{.CapitalEntityName}}s(Delete{{.CapitalEntityName}}sRequest) returns (Delete{{.CapitalEntityName}}sResponse) {
+    option (google.api.http) = {
+      patch: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s"
+      body: "*"
+    };
+  }
+
+{{if .HasImportRequest}}
+  // Imports a {{.CapitalEntityName}}.
+  rpc Import{{.CapitalEntityName}}(Import{{.CapitalEntityName}}Request) returns (Import{{.CapitalEntityName}}Response) {
+    option (google.api.http) = {
+      post: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s/{id=*}:import"
+      body: "*"
+    };
+    option (google.api.method_signature) = "id,import_configs";
+  }
+{{end}}
+{{if .HasExportRequest}}
+  // Exports a {{.CapitalEntityName}}.
+  rpc Export{{.CapitalEntityName}}(Export{{.CapitalEntityName}}Request) returns (Export{{.CapitalEntityName}}Response) {
+    option (google.api.http) = {
+      post: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s/{id=*}:export"
+      body: "*"
+    };
+    option (google.api.method_signature) = "id,export_config";
+  }
+{{end}}
+}
+
+// Request message for [{{.CapitalEntityName}}Service.Create{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Create{{.CapitalEntityName}}].
+message Create{{.CapitalEntityName}}Request {
+  // Required. The resource name of the ParentUri to create the {{.CapitalEntityName}} in.
+  // Format: `{{.ParentUriPattern}}`
+  string parent = 1;
+
+  // Required. The {{.CapitalEntityName}} to create.
+  {{.CapitalEntityName}} {{.EntityName}} = 2;
+}
+
+// Response message for [{{.CapitalEntityName}}Service.Create{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Create{{.CapitalEntityName}}].
+message Create{{.CapitalEntityName}}Response {
+  // status code.
+  int32 code = 1;
+  // error message.
+  string message = 2;
+  // response data.
+  {{.CapitalEntityName}} details = 3;
+}
+
+// Request message for [{{.CapitalEntityName}}Service.Get{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Get{{.CapitalEntityName}}].
+message Get{{.CapitalEntityName}}Request {
+  // Required. The id of the {{.CapitalEntityName}} in database.
+  int64 id = 1;
+
+  // Mask specifying which fields to read.
+  google.protobuf.FieldMask read_mask = 2;
+}
+
+// Response message for [{{.CapitalEntityName}}Service.Get{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Get{{.CapitalEntityName}}].
+message Get{{.CapitalEntityName}}Response {
+  // status code.
+  int32 code = 1;
+  // error message.
+  string message = 2;
+  // response data.
+  {{.CapitalEntityName}} details = 3;
+}
+
+// Request message for [{{.CapitalEntityName}}Service.Update{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Update{{.CapitalEntityName}}].
+message Update{{.CapitalEntityName}}Request {
+  // Required. The {{.CapitalEntityName}} which replaces the resource on the server.
+  {{.CapitalEntityName}} {{.EntityName}} = 1;
+
+  // Required. The update mask applies to the resource.
+  // For the `FieldMask` definition, see [google.protobuf.FieldMask][google.protobuf.FieldMask].
+  // Updatable fields:
+  //
+  //   * `id`
+  //   * `update_at`
+  //   * `create_at`
+  google.protobuf.FieldMask update_mask = 2;
+}
+
+// Response message for [{{.CapitalEntityName}}Service.Update{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Update{{.CapitalEntityName}}].
+message Update{{.CapitalEntityName}}Response {
+  // status code.
+  int32 code = 1;
+  // error message.
+  string message = 2;
+  // response data.
+  {{.CapitalEntityName}} details = 3;
+}
+
+// Request message for [{{.CapitalEntityName}}Service.List{{.CapitalEntityName}}s][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.List{{.CapitalEntityName}}s].
+message List{{.CapitalEntityName}}sRequest {
+  // Required. The name of the {{.CapitalEntityName}}'s parent resource.
+  // Format: `{{.ParentUriPattern}}`
+  string parent = 1;
+
+  // The standard page number, start with zero, use cursor or size as page rotation.
+  int32 page = 2;
+
+  // The standard list page size.
+  int32 size = 3;
+
+  // The standard list page cursor.
+  string cursor = 4;
+
+  // The search keyword.
+  string query = 5;
+
+  // Mask specifying which fields to read.
+  google.protobuf.FieldMask read_mask = 6;
+
+  // A comma-separated list of fields to order by, sorted in ascending order.
+  // Use "desc" after a field name for descending.
+  // Supported fields:
+  //   * `create_at`
+  //   * `update_at`
+  string order_by = 7;
+
+  // filter struct for list.
+  {{.CapitalEntityName}}Filter f = 8;
+}
+
+// Response message for [{{.CapitalEntityName}}Service.List{{.CapitalEntityName}}s][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.List{{.CapitalEntityName}}s].
+message List{{.CapitalEntityName}}sResponse {
+  // status code.
+  int32 code = 1;
+  // error message.
+  string message = 2;
+  message Details {
+    // A list of {{.CapitalEntityName}}s that matches the specified filter in the request.
+    repeated {{.CapitalEntityName}} items = 1;
+    // next page number.
+    int32 next_page = 2;
+    // next page size.
+    int32 next_size = 3;
+    // next page cursor.
+    string next_cursor = 4;
+    // total items count of this filter.
+    int32 total_count = 5;
+  }
+  Details details = 3;
+}
+
+// Request message for [{{.CapitalEntityName}}Service.Delete{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Delete{{.CapitalEntityName}}].
+message Delete{{.CapitalEntityName}}Request {
+  // Required. The resource name of the {{.CapitalEntityName}} to delete.
+  // Format:
+  // `{{.EntityResourcePattern}}`
+  int64 id = 1;
+}
+
+// Response message for [{{.CapitalEntityName}}Service.Delete{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Delete{{.CapitalEntityName}}].
+message Delete{{.CapitalEntityName}}Response {
+  // status code.
+  int32 code = 1;
+  // error message.
+  string message = 2;
+  // response data.
+  {{.CapitalEntityName}} details = 3;
+}
+
+// Request message for [{{.CapitalEntityName}}Service.Delete{{.CapitalEntityName}}s][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Delete{{.CapitalEntityName}}s].
+message Delete{{.CapitalEntityName}}sRequest {
+  // filter struct for delete items.
+  {{.CapitalEntityName}}Filter f = 1;
+}
+
+// Response message for [{{.CapitalEntityName}}Service.Delete{{.CapitalEntityName}}s][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Delete{{.CapitalEntityName}}s].
+message Delete{{.CapitalEntityName}}sResponse {
+  // status code.
+  int32 code = 1;
+  // error message.
+  string message = 2;
+  // deleted id list.
+  repeated int64 details = 3;
+}
+
+{{if .HasImportRequest}}
+// Request message for [{{.CapitalEntityName}}Service.Import{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Import{{.CapitalEntityName}}].
+message Import{{.CapitalEntityName}}Request {
+  // Required. The name of the {{.CapitalEntityName}} resource.
+  // Format:
+  // `{{.EntityResourcePattern}}`
+  int64 id = 1;
+
+  // Required. The desired input configs. The contents of all input configs will be
+  // imported in one batch.
+  repeated Import{{.CapitalEntityName}}Config import_configs = 2;
+}
+
+// Response message for [{{.CapitalEntityName}}Service.Import{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Import{{.CapitalEntityName}}].
+message Import{{.CapitalEntityName}}Response {
+  // status code.
+  int32 code = 1;
+  // error message.
+  string message = 2;
+  // success or fail.
+  bool details = 3;
+}
+{{end}}
+
+{{if .HasExportRequest}}
+// Request message for [{{.CapitalEntityName}}Service.Export{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Export{{.CapitalEntityName}}].
+message Export{{.CapitalEntityName}}Request {
+  // Required. The name of the {{.CapitalEntityName}} resource.
+  // Format:
+  // `{{.EntityResourcePattern}}`
+  int64 id  = 1;
+
+  // Required. The desired output location.
+  Export{{.CapitalEntityName}}Config export_config = 2;
+}
+
+// Response message for [{{.CapitalEntityName}}Service.Export{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Export{{.CapitalEntityName}}].
+message Export{{.CapitalEntityName}}Response {
+  // status code.
+  int32 code = 1;
+  // error message.
+  string message = 2;
+  // All of the files that are exported in this export operation.
+  repeated string details = 3;
+}
+{{end}}

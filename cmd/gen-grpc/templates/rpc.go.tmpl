@@ -1,0 +1,108 @@
+package {{.PackageName}}
+
+import (
+	"context"
+	"net"
+
+	"github.com/gogf/gf/frame/g"
+	"github.com/leventeliu/goproc"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
+	{{range .Imports}}{{.}}
+	{{end}}
+	// Import all known interceptors.
+	{{range .InterceptorPackages}}_ "{{.}}"
+	{{end}}
+	"github.com/artistml/toolkits/pkg/lib/grpc/interceptor"
+	customGrpc "github.com/artistml/toolkits/pkg/lib/grpc"
+)
+
+func loadUnaryInterceptors(ctx context.Context) (its []grpc.UnaryServerInterceptor) {
+	names, ok := ctx.Value(customGrpc.UnaryServerInterceptorsKey).([]string)
+	if !ok {
+		names = g.Cfg().GetStrings(customGrpc.UnaryServerInterceptorsKey)
+	}
+	for _, name := range names {
+		it, ok := interceptor.GetUnary(name)
+		if !ok {
+			g.Log().Fatalf("failed to load interceptor %s, did you register it first?", name)
+		}
+		g.Log().Debugf("loading an unary interceptor: %s", name)
+		its = append(its, it)
+	}
+	return
+}
+
+func loadStreamInterceptors(ctx context.Context) (its []grpc.StreamServerInterceptor) {
+	names, ok := ctx.Value(customGrpc.StreamServerInterceptorsKey).([]string)
+	if !ok {
+		names = g.Cfg().GetStrings(customGrpc.StreamServerInterceptorsKey)
+	}
+	for _, name := range names {
+		it, ok := interceptor.GetStream(name)
+		if !ok {
+			g.Log().Fatalf("failed to load interceptor %s, did you register it first?", name)
+		}
+		g.Log().Debugf("loading a stream interceptor: %s", name)
+		its = append(its, it)
+	}
+	return
+}
+
+// RunRPC loads config and runs an RPC server to serve endpoints.
+func RunRPC(ctx context.Context) {
+	srv := ctx.Value("server")
+	defaultReceiveSize, defaultSendSize := customGrpc.GetReceiveAndSendMsgSize()
+	g.Log().Infof("defaultReceiveSize = %d, defaultSendSize = %d", defaultReceiveSize, defaultSendSize)
+
+	rpc := grpc.NewServer(
+		grpc.Creds(insecure.NewCredentials()),
+		grpc.ChainUnaryInterceptor(loadUnaryInterceptors(ctx)...),
+		grpc.ChainStreamInterceptor(loadStreamInterceptors(ctx)...),
+		grpc.MaxSendMsgSize(defaultReceiveSize),
+		grpc.MaxRecvMsgSize(defaultSendSize),
+	)
+	{{range .RegisterServerMethods}}{{.}}
+	{{end}}
+	var serverConfigs []customGrpc.ServerConfig
+	serverConfig, ok := ctx.Value(customGrpc.ServerKey).(*customGrpc.ServerConfig)
+	if ok {
+		serverConfigs = append(serverConfigs, *serverConfig)
+	} else {
+		err := g.Cfg().GetJson(customGrpc.ServerKey).Structs(&serverConfigs)
+		if err != nil {
+			g.Log().Fatalf("failed to parse rpc server configs: %s", err)
+		}
+	}
+
+	ctrl := goproc.NewController(ctx, "server.grpc.{{.PackageName}}")
+	defer ctrl.Wait()
+	for i := range serverConfigs {
+		ctrl.WithValue("config", &serverConfigs[i]).
+			WithValue("server", rpc).
+			Go(serveRPC)
+	}
+	ctrl.Go(func(ctx context.Context) {
+		<-ctx.Done()
+		g.Log().Infof("get context notify: name=server.grpc error=%s", ctx.Err())
+		rpc.GracefulStop()
+	})
+}
+
+func serveRPC(ctx context.Context) {
+	rpc := ctx.Value("server").(*grpc.Server)
+	cfg := ctx.Value("config").(*customGrpc.ServerConfig)
+
+	g.Log().Infof("starting grpc server: name=%s address=%s@%s", cfg.Name, cfg.Network, cfg.Address)
+	listener, err := net.Listen(cfg.Network, cfg.Address)
+	if err != nil {
+		g.Log().Fatalf("failed to listen %s@%s: %s", cfg.Network, cfg.Address, err)
+	}
+
+	err = rpc.Serve(listener)
+	if err != nil {
+		g.Log().Fatalf("grpc server exiting: name=%s, error=%s", cfg.Name, err)
+	}
+	g.Log().Infof("grpc server exited: name=%s", cfg.Name)
+}
