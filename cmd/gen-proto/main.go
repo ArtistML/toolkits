@@ -112,24 +112,28 @@ func main() {
 
 	var pkgPaths []string
 	err = filepath.Walk(rootPath, func(walkPath string, info os.FileInfo, err error) error {
-		if info.IsDir() && path.Dir(path.Dir(walkPath)) == rootPath {
-			match := true
-			if len(opts.Filters) > 0 {
-				// 定义了 filter 的情况下只对包含某个 filter 的路径进行 service proto 生成
-				for _, subPath := range opts.Filters {
-					if !strings.Contains(walkPath, subPath) {
-						continue
-					}
-					match = false
-					break
-				}
-			}
-			if !match {
-				return nil
-			}
-			pkgPaths = append(pkgPaths, walkPath)
-
+		if !info.IsDir() {
+			return nil
 		}
+		if path.Dir(path.Dir(walkPath)) != rootPath {
+			return nil
+		}
+		match := true
+		if len(opts.Filters) > 0 {
+			match = false
+			// 定义了 filter 的情况下只对包含某个 filter 的路径进行 service proto 生成
+			for _, subPath := range opts.Filters {
+				if !strings.Contains(walkPath, subPath) {
+					continue
+				}
+				match = true
+				break
+			}
+		}
+		if !match {
+			return nil
+		}
+		pkgPaths = append(pkgPaths, walkPath)
 		return nil
 	})
 	for _, pkgPath := range pkgPaths {
