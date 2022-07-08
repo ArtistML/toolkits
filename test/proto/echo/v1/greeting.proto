@@ -7,6 +7,8 @@ import "google/api/resource.proto";
 
 message Greeting {
   option (google.api.resource) = {
+    // authImport: import "auth/v1/options.proto";
+    // authOption: option (auth.v1.auth_options) = {require_authentication: true};
     type: "github.com.artistml/Greeting"
     pattern: "echos/greetings/{id}"
   };

@@ -7,10 +7,6 @@ import "google/api/resource.proto";
 
 
 message Greeting {
-  option (google.api.resource) = {
-    type: "github.com.artistml/Greeting"
-    pattern: "echos/greetings/{id}"
-  };
   // auto increase id.
   int64 id = 1 ;
 

@@ -4,83 +4,88 @@ import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/protobuf/field_mask.proto";
 
+{{if .EntityResourcePattern}}{{.AuthImport}}{{end}}
 import "{{.PackageName}}/v{{.PackageVersionNo}}/{{.EntityName}}.proto";
 
 // The service that handles the CRUD of {{.CapitalEntityName}}.
 service {{.CapitalEntityName}}Service {
 {{if .DefaultHost}}
-  option (google.api.default_host) = "{{.DefaultHost}}";
-{{end}}
+  option (google.api.default_host) = "{{.DefaultHost}}";{{end}}
   // Creates a {{.CapitalEntityName}}.
   rpc Create{{.CapitalEntityName}}(Create{{.CapitalEntityName}}Request) returns (Create{{.CapitalEntityName}}Response) {
+{{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
       post: "/v{{.PackageVersionNo}}/{parent={{.ParentUri}}}/{{.EntityName}}s"
       body: "{{.EntityName}}"
     };
-    option (google.api.method_signature) = "parent,{{.EntityName}}";
+    option (google.api.method_signature) = "parent,{{.EntityName}}";{{end}}
   }
 
   // Gets a {{.CapitalEntityName}}.
   rpc Get{{.CapitalEntityName}}(Get{{.CapitalEntityName}}Request) returns (Get{{.CapitalEntityName}}Response) {
+{{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
       get: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s/{id=*}"
     };
-    option (google.api.method_signature) = "id";
+    option (google.api.method_signature) = "id";{{end}}
   }
 
   // Updates a {{.CapitalEntityName}}.
   rpc Update{{.CapitalEntityName}}(Update{{.CapitalEntityName}}Request) returns (Update{{.CapitalEntityName}}Response) {
+{{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
       patch: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s/{{.EntityIdExpr}}"
       body: "{{.EntityName}}"
     };
-    option (google.api.method_signature) = "{{.EntityName}},update_mask";
+    option (google.api.method_signature) = "{{.EntityName}},update_mask";{{end}}
   }
 
   // Lists {{.CapitalEntityName}}s in a Location.
   rpc List{{.CapitalEntityName}}s(List{{.CapitalEntityName}}sRequest) returns (List{{.CapitalEntityName}}sResponse) {
+{{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
       get: "/v{{.PackageVersionNo}}/{parent={{.ParentUri}}}/{{.EntityName}}s"
     };
-    option (google.api.method_signature) = "parent";
+    option (google.api.method_signature) = "parent";{{end}}
   }
 
   // Deletes a {{.CapitalEntityName}}.
   rpc Delete{{.CapitalEntityName}}(Delete{{.CapitalEntityName}}Request) returns (Delete{{.CapitalEntityName}}Response) {
+{{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
       delete: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s/{id=*}"
     };
-    option (google.api.method_signature) = "id";
+    option (google.api.method_signature) = "id";{{end}}
   }
 
   // Batch delete {{.CapitalEntityName}} by filter.
   rpc Delete{{.CapitalEntityName}}s(Delete{{.CapitalEntityName}}sRequest) returns (Delete{{.CapitalEntityName}}sResponse) {
+{{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
       patch: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s"
       body: "*"
-    };
+    };{{end}}
   }
-
 {{if .HasImportRequest}}
   // Imports a {{.CapitalEntityName}}.
   rpc Import{{.CapitalEntityName}}(Import{{.CapitalEntityName}}Request) returns (Import{{.CapitalEntityName}}Response) {
+{{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
       post: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s/{id=*}:import"
       body: "*"
     };
-    option (google.api.method_signature) = "id,import_configs";
-  }
-{{end}}
+    option (google.api.method_signature) = "id,import_configs";{{end}}
+  }{{end}}
 {{if .HasExportRequest}}
   // Exports a {{.CapitalEntityName}}.
   rpc Export{{.CapitalEntityName}}(Export{{.CapitalEntityName}}Request) returns (Export{{.CapitalEntityName}}Response) {
+{{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
       post: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s/{id=*}:export"
       body: "*"
     };
-    option (google.api.method_signature) = "id,export_config";
-  }
-{{end}}
+    option (google.api.method_signature) = "id,export_config";{{end}}
+  }{{end}}
 }
 
 // Request message for [{{.CapitalEntityName}}Service.Create{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Create{{.CapitalEntityName}}].
@@ -255,8 +260,7 @@ message Import{{.CapitalEntityName}}Response {
   string message = 2;
   // success or fail.
   bool details = 3;
-}
-{{end}}
+}{{end}}
 
 {{if .HasExportRequest}}
 // Request message for [{{.CapitalEntityName}}Service.Export{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Export{{.CapitalEntityName}}].
@@ -278,5 +282,4 @@ message Export{{.CapitalEntityName}}Response {
   string message = 2;
   // All of the files that are exported in this export operation.
   repeated string details = 3;
-}
-{{end}}
+}{{end}}
