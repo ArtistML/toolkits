@@ -54,6 +54,11 @@ var (
 	fs             embed.FS
 	uriRegexp      = regexp.MustCompile(`\{[a-zA-Z\d]+\}`)
 	uriReplacement = "*"
+	ignoreFiles = map[string]bool{
+		"common_resources.proto": true,
+		"types.proto": true,
+		"enums.proto": true,
+	}
 )
 
 func checkErr(err error) {
@@ -148,7 +153,7 @@ func main() {
 			if strings.Contains(walkPath, "_service.proto") {
 				return nil
 			}
-			if strings.Contains(walkPath, "common_resources.proto") {
+			if _, ok := ignoreFiles[path.Base(walkPath)]; ok {
 				return nil
 			}
 
