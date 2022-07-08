@@ -33,12 +33,16 @@ type Opt struct {
 	ParentUriType         string `required:"true" json:"ParentUriType"`
 	HasImportRequest      bool   `required:"true" json:"HasImportRequest"`
 	HasExportRequest      bool   `required:"true" json:"HasExportRequest"`
+	AuthImport string `required:"true" json:"AuthImport"`
+	AuthOption string `required:"true" json:"AuthOption"`
 }
 
 type ApiResource struct {
 	Type    string `json:"Type"`
 	Pattern string `json:"Pattern"`
 	Uri     string `json:"Uri"`
+	AuthImport string `json:"AuthImport"`
+	AuthOption string `json:"AuthOption"`
 }
 
 var (
@@ -93,7 +97,10 @@ func readLines(messageFile string, filters []string) ([]string, map[string][]int
 }
 
 func readResource(messageFile string) *ApiResource {
-	lines, matchFilters := readLines(messageFile, []string{"type:", "pattern:"})
+	lines, matchFilters := readLines(messageFile, []string{"google.api.resource", "type:", "pattern:", "authImport", "authOption"})
+	if _, ok :=matchFilters["google.api.resource"]; !ok {
+		return nil
+	}
 	resourceType := strings.Trim(lines[matchFilters["type:"][0]], " \n\t")
 	start, end := strings.IndexAny(resourceType, "\""), strings.LastIndex(resourceType, "\"")
 	rType := resourceType[start+1 : end]
@@ -101,11 +108,18 @@ func readResource(messageFile string) *ApiResource {
 	start, end = strings.IndexAny(resourcePattern, "\""), strings.LastIndex(resourcePattern, "\"")
 	rPattern := resourcePattern[start+1 : end]
 	resourcePattern = resourcePattern[strings.IndexAny(resourcePattern, "\""):strings.LastIndex(resourcePattern, "\"")]
-	return &ApiResource{
+	apiResouce := &ApiResource{
 		Type:    rType,
 		Pattern: rPattern,
 		Uri:     uriRegexp.ReplaceAllString(rPattern, uriReplacement),
 	}
+	if value, ok := matchFilters["authImport"]; ok {
+		apiResouce.AuthImport = strings.Trim(strings.Split(lines[value[0]],"authImport")[1], " :\n\t")
+	}
+	if value, ok := matchFilters["authOption"]; ok {
+		apiResouce.AuthOption = strings.Trim(strings.Split(lines[value[0]],"authOption")[1], " :\n\t")
+	}
+	return apiResouce
 }
 
 func main() {
@@ -143,6 +157,10 @@ func main() {
 	})
 	for _, pkgPath := range pkgPaths {
 		parentResource := readResource(path.Join(pkgPath, "common_resources.proto"))
+		if parentResource == nil {
+			fmt.Println("common_resources.proto must contains google.api.resource_definition")
+			os.Exit(1)
+		}
 		err = filepath.Walk(pkgPath, func(walkPath string, info os.FileInfo, err error) error {
 			if info.IsDir() {
 				return nil
@@ -158,9 +176,13 @@ func main() {
 			}
 
 			entityResource := readResource(walkPath)
-			if !strings.HasPrefix(entityResource.Pattern, parentResource.Pattern) {
-				fmt.Printf("Resource %s of entity should start with parent's resource %s!\n", entityResource.Pattern, parentResource.Pattern)
-				os.Exit(1)
+			if entityResource == nil {
+				entityResource = &ApiResource{}
+			} else {
+				if !strings.HasPrefix(entityResource.Pattern, parentResource.Pattern) {
+					fmt.Printf("Resource %s of entity should start with parent's resource %s!\n", entityResource.Pattern, parentResource.Pattern)
+					os.Exit(1)
+				}
 			}
 			lines, matchFilters := readLines(walkPath, []string{"import", "Import", "Export"})
 			i := matchFilters["import"][0]
@@ -182,6 +204,8 @@ func main() {
 				ParentUriType:         parentResource.Type,
 				HasImportRequest:      hasImportRequest,
 				HasExportRequest:      hasExportRequest,
+				AuthImport: entityResource.AuthImport,
+				AuthOption: entityResource.AuthOption,
 			})
 			return nil
 		})
