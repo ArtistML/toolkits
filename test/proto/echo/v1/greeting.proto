@@ -29,3 +29,7 @@ message GreetingFilter {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
 }
+
+message ExportGreetingConfig {
+  string file_path = 1;
+}

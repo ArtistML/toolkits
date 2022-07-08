@@ -33,14 +33,14 @@ type Opt struct {
 	ParentUriType         string `required:"true" json:"ParentUriType"`
 	HasImportRequest      bool   `required:"true" json:"HasImportRequest"`
 	HasExportRequest      bool   `required:"true" json:"HasExportRequest"`
-	AuthImport string `required:"true" json:"AuthImport"`
-	AuthOption string `required:"true" json:"AuthOption"`
+	AuthImport            string `required:"true" json:"AuthImport"`
+	AuthOption            string `required:"true" json:"AuthOption"`
 }
 
 type ApiResource struct {
-	Type    string `json:"Type"`
-	Pattern string `json:"Pattern"`
-	Uri     string `json:"Uri"`
+	Type       string `json:"Type"`
+	Pattern    string `json:"Pattern"`
+	Uri        string `json:"Uri"`
 	AuthImport string `json:"AuthImport"`
 	AuthOption string `json:"AuthOption"`
 }
@@ -58,10 +58,10 @@ var (
 	fs             embed.FS
 	uriRegexp      = regexp.MustCompile(`\{[a-zA-Z\d]+\}`)
 	uriReplacement = "*"
-	ignoreFiles = map[string]bool{
+	ignoreFiles    = map[string]bool{
 		"common_resources.proto": true,
-		"types.proto": true,
-		"enums.proto": true,
+		"types.proto":            true,
+		"enums.proto":            true,
 	}
 )
 
@@ -98,7 +98,7 @@ func readLines(messageFile string, filters []string) ([]string, map[string][]int
 
 func readResource(messageFile string) *ApiResource {
 	lines, matchFilters := readLines(messageFile, []string{"google.api.resource", "type:", "pattern:", "authImport", "authOption"})
-	if _, ok :=matchFilters["google.api.resource"]; !ok {
+	if _, ok := matchFilters["google.api.resource"]; !ok {
 		return nil
 	}
 	resourceType := strings.Trim(lines[matchFilters["type:"][0]], " \n\t")
@@ -114,10 +114,10 @@ func readResource(messageFile string) *ApiResource {
 		Uri:     uriRegexp.ReplaceAllString(rPattern, uriReplacement),
 	}
 	if value, ok := matchFilters["authImport"]; ok {
-		apiResouce.AuthImport = strings.Trim(strings.Split(lines[value[0]],"authImport")[1], " :\n\t")
+		apiResouce.AuthImport = strings.Trim(strings.Split(lines[value[0]], "authImport")[1], " :\n\t")
 	}
 	if value, ok := matchFilters["authOption"]; ok {
-		apiResouce.AuthOption = strings.Trim(strings.Split(lines[value[0]],"authOption")[1], " :\n\t")
+		apiResouce.AuthOption = strings.Trim(strings.Split(lines[value[0]], "authOption")[1], " :\n\t")
 	}
 	return apiResouce
 }
@@ -184,12 +184,14 @@ func main() {
 					os.Exit(1)
 				}
 			}
-			lines, matchFilters := readLines(walkPath, []string{"import", "Import", "Export"})
+			entityName := strings.Split(path.Base(walkPath), ".")[0]
+			capitalEntityName := strings.ToUpper(entityName[:1]) + entityName[1:]
+			importConfigName, exportConfigName := fmt.Sprintf("Import%sConfig", capitalEntityName), fmt.Sprintf("Export%sConfig", capitalEntityName)
+			lines, matchFilters := readLines(walkPath, []string{"import", importConfigName, exportConfigName})
 			i := matchFilters["import"][0]
 			headers := strings.Join(lines[:i], "\n")
-			entityName := strings.Split(path.Base(walkPath), ".")[0]
-			_, hasImportRequest := matchFilters["Import"]
-			_, hasExportRequest := matchFilters["Export"]
+			_, hasImportRequest := matchFilters[importConfigName]
+			_, hasExportRequest := matchFilters[exportConfigName]
 			optList = append(optList, Opt{
 				Output: pkgPath, DefaultHost: opts.DefaultHost, EntityHeaders: headers,
 				PackageName:           path.Base(path.Dir(pkgPath)),
@@ -198,14 +200,14 @@ func main() {
 				EntityIdExpr:          fmt.Sprintf("{%s.id=*}", entityName),
 				EntityResourceType:    entityResource.Type,
 				EntityResourcePattern: entityResource.Pattern,
-				CapitalEntityName:     strings.ToUpper(entityName[:1]) + entityName[1:],
+				CapitalEntityName:     capitalEntityName,
 				ParentUri:             parentResource.Uri,
 				ParentUriPattern:      parentResource.Pattern,
 				ParentUriType:         parentResource.Type,
 				HasImportRequest:      hasImportRequest,
 				HasExportRequest:      hasExportRequest,
-				AuthImport: entityResource.AuthImport,
-				AuthOption: entityResource.AuthOption,
+				AuthImport:            entityResource.AuthImport,
+				AuthOption:            entityResource.AuthOption,
 			})
 			return nil
 		})
