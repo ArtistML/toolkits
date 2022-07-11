@@ -19,7 +19,7 @@ service GreetingService {
   rpc CreateGreeting(CreateGreetingRequest) returns (CreateGreetingResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      post: "/v1/{parent=echos}/greetings"
+      post: "/v1/{parent=echos/*}/greetings"
       body: "greeting"
     };
     option (google.api.method_signature) = "parent,greeting";
@@ -29,7 +29,7 @@ service GreetingService {
   rpc GetGreeting(GetGreetingRequest) returns (GetGreetingResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      get: "/v1/echos/greetings/{id=*}"
+      get: "/v1/echos/*/greetings/{id=*}"
     };
     option (google.api.method_signature) = "id";
   }
@@ -38,7 +38,7 @@ service GreetingService {
   rpc UpdateGreeting(UpdateGreetingRequest) returns (UpdateGreetingResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      patch: "/v1/echos/greetings/{greeting.id=*}"
+      patch: "/v1/echos/*/greetings/{greeting.id=*}"
       body: "greeting"
     };
     option (google.api.method_signature) = "greeting,update_mask";
@@ -48,7 +48,7 @@ service GreetingService {
   rpc ListGreetings(ListGreetingsRequest) returns (ListGreetingsResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      get: "/v1/{parent=echos}/greetings"
+      get: "/v1/{parent=echos/*}/greetings"
     };
     option (google.api.method_signature) = "parent";
   }
@@ -57,7 +57,7 @@ service GreetingService {
   rpc DeleteGreeting(DeleteGreetingRequest) returns (DeleteGreetingResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      delete: "/v1/echos/greetings/{id=*}"
+      delete: "/v1/echos/*/greetings/{id=*}"
     };
     option (google.api.method_signature) = "id";
   }
@@ -66,17 +66,26 @@ service GreetingService {
   rpc DeleteGreetings(DeleteGreetingsRequest) returns (DeleteGreetingsResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      patch: "/v1/echos/greetings"
+      patch: "/v1/echos/*/greetings"
       body: "*"
     };
   }
 
+  // Imports a Greeting.
+  rpc ImportGreeting(ImportGreetingRequest) returns (ImportGreetingResponse) {
+    option (auth.v1.auth_options) = {require_authentication: true};
+    option (google.api.http) = {
+      post: "/v1/{parent=echos/*/greetings}:import"
+      body: "*"
+    };
+    option (google.api.method_signature) = "parent,import_configs";
+  }
 
   // Exports a Greeting.
   rpc ExportGreeting(ExportGreetingRequest) returns (ExportGreetingResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      post: "/v1/{parent=echos/greetings}:export"
+      post: "/v1/{parent=echos/*/greetings}:export"
       body: "*"
     };
     option (google.api.method_signature) = "parent,export_config";
@@ -86,7 +95,7 @@ service GreetingService {
 // Request message for [GreetingService.CreateGreeting][v1.GreetingService.CreateGreeting].
 message CreateGreetingRequest {
   // Required. The resource name of the ParentUri to create the Greeting in.
-  // Format: `echos`
+  // Format: `echos/{echo_id}`
   string parent = 1;
 
   // Required. The Greeting to create.
@@ -150,7 +159,7 @@ message UpdateGreetingResponse {
 // Request message for [GreetingService.ListGreetings][v1.GreetingService.ListGreetings].
 message ListGreetingsRequest {
   // Required. The name of the Greeting's parent resource.
-  // Format: `echos`
+  // Format: `echos/{echo_id}`
   string parent = 1;
 
   // The standard page number, start with zero, use cursor or size as page rotation.
@@ -204,7 +213,7 @@ message ListGreetingsResponse {
 message DeleteGreetingRequest {
   // Required. The resource name of the Greeting to delete.
   // Format:
-  // `echos/greetings/{id}`
+  // `echos/{echo_id}/greetings/{id}`
   int64 id = 1;
 }
 
@@ -235,13 +244,34 @@ message DeleteGreetingsResponse {
 }
 
 
+// Request message for [GreetingService.ImportGreeting][v1.GreetingService.ImportGreeting].
+message ImportGreetingRequest {
+  // Required. The name of the Greeting resource.
+  // Format:
+  // `echos/{echo_id}/greetings`
+  string parent = 1;
+
+  // Required. The desired input configs. The contents of all input configs will be
+  // imported in one batch.
+  repeated ImportGreetingConfig import_configs = 2;
+}
+
+// Response message for [GreetingService.ImportGreeting][v1.GreetingService.ImportGreeting].
+message ImportGreetingResponse {
+  // status code.
+  int32 code = 1;
+  // error message.
+  string message = 2;
+  // success or fail.
+  bool details = 3;
+}
 
 
 // Request message for [GreetingService.ExportGreeting][v1.GreetingService.ExportGreeting].
 message ExportGreetingRequest {
   // Required. The name of the Greeting resource.
   // Format:
-  // `echos/greetings`
+  // `echos/{echo_id}/greetings`
   string parent = 1;
 
   // Required. The desired output location.

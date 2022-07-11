@@ -6,5 +6,5 @@ import "google/api/resource.proto";
 
 option (google.api.resource_definition) = {
   type: "github.com.artistml/Echo"
-  pattern: "echos"
+  pattern: "echos/{echo_id}"
 };
