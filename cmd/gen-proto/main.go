@@ -56,7 +56,7 @@ var (
 	optList = []Opt{}
 	//go:embed templates/*.tmpl
 	fs             embed.FS
-	uriRegexp      = regexp.MustCompile(`\{[a-zA-Z\d]+\}`)
+	uriRegexp      = regexp.MustCompile(`\{[a-zA-Z_\d]+\}`)
 	uriReplacement = "*"
 	ignoreFiles    = map[string]bool{
 		"common_resources.proto": true,
@@ -108,18 +108,22 @@ func readResource(messageFile string) *ApiResource {
 	start, end = strings.IndexAny(resourcePattern, "\""), strings.LastIndex(resourcePattern, "\"")
 	rPattern := resourcePattern[start+1 : end]
 	resourcePattern = resourcePattern[strings.IndexAny(resourcePattern, "\""):strings.LastIndex(resourcePattern, "\"")]
-	apiResouce := &ApiResource{
+	apiResource := &ApiResource{
 		Type:    rType,
 		Pattern: rPattern,
 		Uri:     uriRegexp.ReplaceAllString(rPattern, uriReplacement),
 	}
+	if strings.Contains(apiResource.Uri, "{") {
+		fmt.Printf("Uri %s can't contains '{' or '}'. \n", apiResource.Uri)
+		os.Exit(1)
+	}
 	if value, ok := matchFilters["authImport"]; ok {
-		apiResouce.AuthImport = strings.Trim(strings.Split(lines[value[0]], "authImport")[1], " :\n\t")
+		apiResource.AuthImport = strings.Trim(strings.Split(lines[value[0]], "authImport")[1], " :\n\t")
 	}
 	if value, ok := matchFilters["authOption"]; ok {
-		apiResouce.AuthOption = strings.Trim(strings.Split(lines[value[0]], "authOption")[1], " :\n\t")
+		apiResource.AuthOption = strings.Trim(strings.Split(lines[value[0]], "authOption")[1], " :\n\t")
 	}
-	return apiResouce
+	return apiResource
 }
 
 func main() {

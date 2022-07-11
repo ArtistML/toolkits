@@ -10,7 +10,7 @@ message Greeting {
     // authImport: import "auth/v1/options.proto";
     // authOption: option (auth.v1.auth_options) = {require_authentication: true};
     type: "github.com.artistml/Greeting"
-    pattern: "echos/greetings/{id}"
+    pattern: "echos/{echo_id}/greetings/{id}"
   };
 
   // auto increase id.
@@ -28,6 +28,10 @@ message Greeting {
 message GreetingFilter {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
+}
+
+message ImportGreetingConfig {
+  string file_path = 1;
 }
 
 message ExportGreetingConfig {
