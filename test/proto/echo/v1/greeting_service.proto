@@ -11,6 +11,27 @@ import "google/protobuf/field_mask.proto";
 import "auth/v1/options.proto";
 import "echo/v1/greeting.proto";
 
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Greeting Service";
+    version: "1.0";
+    contact: {
+      name: "Greeting Service";
+      url: "http://github.com/artistml/toolkits/echos/{echo_id}";
+    }
+  };
+  host: "github.com/artistml/toolkits";
+  base_path: "/echo/v1";
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+  external_docs: {
+    description: "API specification in Markdown",
+    url: "http://host=github.com/artistml/toolkits/echo/v1"
+  }
+};
+
 // The service that handles the CRUD of Greeting.
 service GreetingService {
 
