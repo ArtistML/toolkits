@@ -28,7 +28,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   produces: "application/json";
   external_docs: {
     description: "API specification in Markdown",
-    url: "http://host=github.com/artistml/toolkits/echo/v2"
+    url: "http://github.com/artistml/toolkits/echo/v2"
   }
 };
 

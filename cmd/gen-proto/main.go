@@ -36,6 +36,7 @@ type Opt struct {
 	AuthImport            string `required:"true" json:"AuthImport"`
 	AuthOption            string `required:"true" json:"AuthOption"`
 	SwaggerHost           string `required:"true" json:"SwaggerHost"`
+	SwaggerUrl            string `required:"true" json:"SwaggerUrl"`
 }
 
 type ApiResource struct {
@@ -52,6 +53,7 @@ var (
 	opts struct {
 		DefaultHost string   `required:"true" long:"host" description:"Default host for whole proto." json:"DefaultHost"`
 		SwaggerHost string   `required:"true" long:"swagger-host" description:"Swagger host for whole proto." json:"SwaggerHost"`
+		SwaggerUrl  string   `required:"true" long:"swagger-url" description:"Swagger host for whole proto." json:"SwaggerUrl"`
 		Filters     []string `required:"false" short:"f" long:"filter" description:"Filter paths for generation." json:"Filters"`
 	}
 
@@ -220,6 +222,7 @@ func main() {
 				AuthImport:            entityResource.AuthImport,
 				AuthOption:            entityResource.AuthOption,
 				SwaggerHost:           opts.SwaggerHost,
+				SwaggerUrl:            opts.SwaggerUrl,
 			})
 			return nil
 		})
