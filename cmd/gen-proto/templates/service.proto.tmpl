@@ -71,20 +71,20 @@ service {{.CapitalEntityName}}Service {
   rpc Import{{.CapitalEntityName}}(Import{{.CapitalEntityName}}Request) returns (Import{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      post: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s/{id=*}:import"
+      post: "/v{{.PackageVersionNo}}/{parent={{.ParentUri}}/{{.EntityName}}s}:import"
       body: "*"
     };
-    option (google.api.method_signature) = "id,import_configs";{{end}}
+    option (google.api.method_signature) = "parent,import_configs";{{end}}
   }{{end}}
 {{if .HasExportRequest}}
   // Exports a {{.CapitalEntityName}}.
   rpc Export{{.CapitalEntityName}}(Export{{.CapitalEntityName}}Request) returns (Export{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      post: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s/{id=*}:export"
+      post: "/v{{.PackageVersionNo}}/{parent={{.ParentUri}}/{{.EntityName}}s}:export"
       body: "*"
     };
-    option (google.api.method_signature) = "id,export_config";{{end}}
+    option (google.api.method_signature) = "parent,export_config";{{end}}
   }{{end}}
 }
 
@@ -244,8 +244,8 @@ message Delete{{.CapitalEntityName}}sResponse {
 message Import{{.CapitalEntityName}}Request {
   // Required. The name of the {{.CapitalEntityName}} resource.
   // Format:
-  // `{{.EntityResourcePattern}}`
-  int64 id = 1;
+  // `{{.ParentUriPattern}}/{{.EntityName}}s`
+  string parent = 1;
 
   // Required. The desired input configs. The contents of all input configs will be
   // imported in one batch.
@@ -267,8 +267,8 @@ message Import{{.CapitalEntityName}}Response {
 message Export{{.CapitalEntityName}}Request {
   // Required. The name of the {{.CapitalEntityName}} resource.
   // Format:
-  // `{{.EntityResourcePattern}}`
-  int64 id  = 1;
+  // `{{.ParentUriPattern}}/{{.EntityName}}s`
+  string parent = 1;
 
   // Required. The desired output location.
   Export{{.CapitalEntityName}}Config export_config = 2;
