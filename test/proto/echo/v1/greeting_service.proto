@@ -7,6 +7,7 @@ option go_package = "github.com/artistml/echo/v1;echoV1";
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/protobuf/field_mask.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 import "auth/v1/options.proto";
 import "echo/v1/greeting.proto";
@@ -21,14 +22,14 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
   };
   host: "github.com/artistml/toolkits";
-  base_path: "/echo/v1";
+  base_path: "/echo/v1/greeting";
   schemes: HTTP;
   schemes: HTTPS;
   consumes: "application/json";
   produces: "application/json";
   external_docs: {
     description: "API specification in Markdown",
-    url: "http://github.com/artistml/toolkits/echo/v1"
+    url: "http://github.com/artistml/toolkits/echo/v1/greeting"
   }
 };
 
