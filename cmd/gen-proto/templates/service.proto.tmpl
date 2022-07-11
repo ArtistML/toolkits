@@ -16,7 +16,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       url: "http://{{.DefaultHost}}/{{.ParentUriPattern}}";
     }
   };
-  host: "{{.DefaultHost}}";
+  host: "{{.SwaggerHost}}";
   base_path: "/{{.PackageName}}/v{{.PackageVersionNo}}";
   schemes: HTTP;
   schemes: HTTPS;
@@ -24,7 +24,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   produces: "application/json";
   external_docs: {
     description: "API specification in Markdown",
-    url: "http://{{.SwaggerHost}}/{{.PackageName}}/v{{.PackageVersionNo}}"
+    url: "http://{{.SwaggerUrl}}/{{.PackageName}}/v{{.PackageVersionNo}}"
   }
 };
 
