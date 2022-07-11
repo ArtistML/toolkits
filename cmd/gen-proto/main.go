@@ -35,6 +35,7 @@ type Opt struct {
 	HasExportRequest      bool   `required:"true" json:"HasExportRequest"`
 	AuthImport            string `required:"true" json:"AuthImport"`
 	AuthOption            string `required:"true" json:"AuthOption"`
+	SwaggerHost           string `required:"true" json:"SwaggerHost"`
 }
 
 type ApiResource struct {
@@ -50,6 +51,7 @@ var (
 	// go run "github.com/artistml/toolkits/cmd/gen-proto" --host=github.com/artistml/toolkits -f echo/v1 -f echo/v2
 	opts struct {
 		DefaultHost string   `required:"true" long:"host" description:"Default host for whole proto." json:"DefaultHost"`
+		SwaggerHost string   `required:"true" long:"swagger-host" description:"Swagger host for whole proto." json:"SwaggerHost"`
 		Filters     []string `required:"false" short:"f" long:"filter" description:"Filter paths for generation." json:"Filters"`
 	}
 
@@ -165,7 +167,7 @@ func main() {
 			fmt.Println("common_resources.proto must contains google.api.resource_definition")
 			os.Exit(1)
 		}
-		modelName := path.Base(path.Dir(pkgPath))
+		pkgName := path.Base(path.Dir(pkgPath))
 		err = filepath.Walk(pkgPath, func(walkPath string, info os.FileInfo, err error) error {
 			if info.IsDir() {
 				return nil
@@ -180,7 +182,7 @@ func main() {
 				return nil
 			}
 			entityName := strings.Split(path.Base(walkPath), ".")[0]
-			if modelName == entityName {
+			if pkgName == entityName {
 				// 对于与 model 同名的 entity，认为是自定义的服务，不需要再生成 service
 				return nil
 			}
@@ -203,7 +205,7 @@ func main() {
 			_, hasExportRequest := matchFilters[exportConfigName]
 			optList = append(optList, Opt{
 				Output: pkgPath, DefaultHost: opts.DefaultHost, EntityHeaders: headers,
-				PackageName:           path.Base(path.Dir(pkgPath)),
+				PackageName:           pkgName,
 				PackageVersionNo:      path.Base(pkgPath)[1:],
 				EntityName:            entityName,
 				EntityIdExpr:          fmt.Sprintf("{%s.id=*}", entityName),
@@ -217,6 +219,7 @@ func main() {
 				HasExportRequest:      hasExportRequest,
 				AuthImport:            entityResource.AuthImport,
 				AuthOption:            entityResource.AuthOption,
+				SwaggerHost:           opts.SwaggerHost,
 			})
 			return nil
 		})

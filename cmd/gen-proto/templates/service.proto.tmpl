@@ -7,6 +7,27 @@ import "google/protobuf/field_mask.proto";
 {{if .EntityResourcePattern}}{{.AuthImport}}{{end}}
 import "{{.PackageName}}/v{{.PackageVersionNo}}/{{.EntityName}}.proto";
 
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "{{.CapitalEntityName}} Service";
+    version: "{{.PackageVersionNo}}.0";
+    contact: {
+      name: "{{.CapitalEntityName}} Service";
+      url: "http://{{.DefaultHost}}/{{.ParentUriPattern}}";
+    }
+  };
+  host: "{{.DefaultHost}}";
+  base_path: "/{{.PackageName}}/v{{.PackageVersionNo}}";
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+  external_docs: {
+    description: "API specification in Markdown",
+    url: "http://{{.SwaggerHost}}/{{.PackageName}}/v{{.PackageVersionNo}}"
+  }
+};
+
 // The service that handles the CRUD of {{.CapitalEntityName}}.
 service {{.CapitalEntityName}}Service {
 {{if .DefaultHost}}
