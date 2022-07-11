@@ -165,6 +165,7 @@ func main() {
 			fmt.Println("common_resources.proto must contains google.api.resource_definition")
 			os.Exit(1)
 		}
+		modelName := path.Base(path.Dir(pkgPath))
 		err = filepath.Walk(pkgPath, func(walkPath string, info os.FileInfo, err error) error {
 			if info.IsDir() {
 				return nil
@@ -178,6 +179,11 @@ func main() {
 			if _, ok := ignoreFiles[path.Base(walkPath)]; ok {
 				return nil
 			}
+			entityName := strings.Split(path.Base(walkPath), ".")[0]
+			if modelName == entityName {
+				// 对于与 model 同名的 entity，认为是自定义的服务，不需要再生成 service
+				return nil
+			}
 
 			entityResource := readResource(walkPath)
 			if entityResource == nil {
@@ -188,7 +194,6 @@ func main() {
 					os.Exit(1)
 				}
 			}
-			entityName := strings.Split(path.Base(walkPath), ".")[0]
 			capitalEntityName := strings.ToUpper(entityName[:1]) + entityName[1:]
 			importConfigName, exportConfigName := fmt.Sprintf("Import%sConfig", capitalEntityName), fmt.Sprintf("Export%sConfig", capitalEntityName)
 			lines, matchFilters := readLines(walkPath, []string{"import", importConfigName, exportConfigName})

@@ -1,0 +1,3 @@
+syntax = "proto3";
+package echo.v1;
+option go_package = "github.com/artistml/echo/v1;echoV1";
