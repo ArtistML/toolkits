@@ -1,3 +1,4 @@
 package echo
 
-//go:generate go run "github.com/artistml/toolkits/cmd/gen-pypkg" -p /Users/sylvan/ArtistML/toolkits-python -i image.senses-ai.com/base-python:3.8.13 -r image.senses-ai.com --nexus-url=http://nexus.senses-ai.com --nexus-username=admin --nexus-password=shanjing0322 --nexus-pypi-path=pypi-hosted --pdm-source-name=pypi --pdm-source-url=http://nexus.senses-ai.com/repository/pypi-group/simple --pdm-author-name=sylvan --pdm-author-email=sylvan2future@gmail.com --pdm-license=ArtistML
+// this is test example. image and registry is invalid.
+//go:generate go run "github.com/artistml/toolkits/cmd/gen-pypkg" -p /tmp/toolkits/toolkits-python -i github.com/artistml/base-python:3.8.13 -r github.com/artistml --nexus-url=http://github.com/artistml --nexus-username=artistml --nexus-password=artistml-pw --nexus-pypi-path=pypi-hosted --pdm-source-name=pypi --pdm-source-url=http://github.com/artistml/repository/pypi-group/simple --pdm-author-name=artistml --pdm-author-email=artistml@github.com --pdm-license=ArtistML
