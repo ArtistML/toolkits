@@ -1,0 +1,13 @@
+FROM {{.BaseImage}}
+
+ARG PROJECT_NAME
+ENV ENV=$PROJECT_NAME
+
+WORKDIR /app
+COPY . /app
+
+RUN set -ex && pdm_path=$(whereis pdm|awk '{print $2}') && ln -sf $pdm_path /usr/local/bin/pdm
+RUN /usr/local/bin/pdm sync
+
+ARG ALGO_VERSION
+ENV ALGO_VERSION=$ALGO_VERSION

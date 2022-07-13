@@ -1,0 +1,70 @@
+[[tool.pdm.source]]
+name = "{{.PdmSourceName}}"
+url = "{{.PdmSourceUrl}}"
+verify_ssl = false
+
+[tool.pdm]
+includes = ["{{.ProjectName}}", "{{.ProjectName}}/**/*"]
+version = {use_scm = true}
+
+[project]
+name = "{{.ProjectName}}"
+dynamic = ["version"]
+description = ""
+authors = [
+    {name = "{{.PdmAuthorName}}", email = "{{.PdmAuthorEmail}}"},
+]
+dependencies = []
+requires-python = ">=3.8"
+readme = "README.md"
+license = {text = "{{.PdmLicense}}"}
+
+[build-system]
+requires = ["pdm-pep517>=0.12.0"]
+build-backend = "pdm.pep517.api"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--cov {{.ProjectName}} --cov-report xml:cov.xml --cov-report term-missing"
+testpaths = [
+    "tests",
+]
+source = ["{{.ProjectName}}",]
+
+[tool.coverage.paths]
+source = [
+  "{{.ProjectName}}",
+]
+
+[tool.coverage.run]
+branch = true
+source = [
+  "{{.ProjectName}}",
+]
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "if self.debug",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if 0:",
+  "if __name__ == .__main__.:",
+  "pass",
+]
+
+[tool.mypy]
+files = [
+    '{{.ProjectName}}',
+]
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+line_length = 79
+force_single_line = true
