@@ -43,7 +43,7 @@ clean:
 init:
 	@printf "🐍 \033[1;32m===> Init $(PROJECT_NAME)...\033[0m\n"
 	pdm lock
-	pdm add -G $(PROJECT_NAME) pytest isort yapf "coverage[toml]<6.4" "setuptools-scm>=6.4.2" "pytest-cov<3.0.0,>=2.12.1"
+	pdm add -G $(PROJECT_NAME) pytest autoflake isort yapf "coverage[toml]<6.4" "setuptools-scm>=6.4.2" "pytest-cov<3.0.0,>=2.12.1"
 	@printf "🐍 \033[1;32m===> Init $(PROJECT_NAME) done.\033[0m\n"
 
 .PHONY: install
@@ -57,6 +57,7 @@ install:
 ## isort and yapf formatting
 format:
 	@printf "🐍 \033[1;32m===> Format $(PROJECT_NAME)...\033[0m\n"
+	pdm run autoflake --in-place --remove-all-unused-imports --remove-unused-variables -r $(PROJECT_NAME) tests
 	pdm run isort $(PROJECT_NAME) tests
 	pdm run yapf -i -r --parallel $(PROJECT_NAME) tests
 	@printf "🐍 \033[1;32m===> Format $(PROJECT_NAME) done.\033[0m\n"
