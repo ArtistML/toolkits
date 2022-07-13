@@ -1,0 +1,135 @@
+### Use toolkit image to run buf commands.
+PROJECT_DIR := $(shell pwd)
+PROJECT_BASE_NAME := $(notdir $(PROJECT_DIR))
+UNDERLINE := _
+DASH := -
+PROJECT_NAME=$(subst $(DASH),$(UNDERLINE),$(PROJECT_BASE_NAME))
+REPO=$(subst $(UNDERLINE),$(DASH),$(PROJECT_BASE_NAME))
+BASE_IMAGE := {{.BaseImage}}
+REGISTRY := {{.Registry}}
+TAG=latest
+
+GIT_COMMIT = $(shell git describe --match= --always)
+GIT_VERSION = $(shell git describe --tags --always)
+
+# Nexus config for PyPI and Docs.
+# Check https://nexus3-cli.readthedocs.io/en/latest/cli.html#environment-variables.
+NEXUS3_URL := {{.NexusUrl}}
+NEXUS3_USERNAME := {{.NexusUsername}}
+NEXUS3_PASSWORD := {{.NexusPassword}}
+PYPI_REPOSITORY_PATH := {{.NexusPypiPath}}
+
+###############################################################################
+# COMMANDS                                                                    #
+###############################################################################
+.PHONY: clean
+## Clean python cache file.
+clean:
+	find . -name '*.pyo' -delete
+	find . -name '*.pyc' -delete
+	find . -name __pycache__ -delete
+	find . -name '*~' -delete
+	find . -name .coverage -delete
+	find . -name '.coverage.*' -delete
+	find . -name 'codeclimate.*' -delete
+	find . -name 'requirements*.txt' -delete
+	find . -name 'report.html' -delete
+	find . -name cov.xml -delete
+	find . -type d -name .pytest_cache -exec rm -r {} +
+	find . -type d -name .mypy_cache -exec rm -r {} +
+
+.PHONY: init
+## init project with pdm
+init:
+	@printf "🐍 \033[1;32m===> Init $(PROJECT_NAME)...\033[0m\n"
+	pdm lock
+	pdm add -G $(PROJECT_NAME) pytest isort yapf "coverage[toml]<6.4" "setuptools-scm>=6.4.2" "pytest-cov<3.0.0,>=2.12.1"
+	@printf "🐍 \033[1;32m===> Init $(PROJECT_NAME) done.\033[0m\n"
+
+.PHONY: install
+## deploy CI environment
+install:
+	@printf "🐍 \033[1;32m===> Install $(PROJECT_NAME)...\033[0m\n"
+	pdm sync -G $(PROJECT_NAME) --clean
+	@printf "🐍 \033[1;32m===> Install $(PROJECT_NAME) done.\033[0m\n"
+
+.PHONY: format
+## isort and yapf formatting
+format:
+	@printf "🐍 \033[1;32m===> Format $(PROJECT_NAME)...\033[0m\n"
+	pdm run isort $(PROJECT_NAME) tests
+	pdm run yapf -i -r --parallel $(PROJECT_NAME) tests
+	@printf "🐍 \033[1;32m===> Format $(PROJECT_NAME) done.\033[0m\n"
+
+.PHONY: test
+## unit tests with pytest
+test:
+	@printf "🐍 \033[1;32m===> Running unit testing for $(PROJECT_NAME)...\033[0m\n"
+	ENV=$(PROJECT_NAME) \
+	    pdm run pytest -s -v --cov-config=$(PROJECT_DIR)/pyproject.toml $(PROJECT_DIR)/tests/unit_test <&-
+	pdm run coverage xml
+	@printf "🐍 \033[1;32m===> Running unit testing for $(PROJECT_NAME) done.\033[0m\n"
+
+.PHONY: integration-test 
+## integration tests with pytest
+integration-test:
+	@printf "🐍 \033[1;32m===> Running integration testing for $(PROJECT_NAME)...\033[0m\n"
+	ENV=$(PROJECT_NAME) \
+	    pdm run pytest -s -v --cov-config=$(PROJECT_DIR)/pyproject.toml $(PROJECT_DIR)/tests/integration_test <&-
+	pdm run coverage xml
+	@printf "🐍 \033[1;32m===> Running integration testing for $(PROJECT_NAME) done.\033[0m\n"
+
+.PHONY: scm-version
+## generate scm version for all pkg
+scm-version:
+	@printf "🐍 \033[1;32m===> Building scm_version.toml...\033[0m\n"
+	@python3 scm_version_sync.py
+	@printf "🐍 \033[1;32m===> scm-version:\033[0m\n"
+	@cat scm_version.toml
+
+.PHONY: pkg-build
+## build and push whl to nexus
+pkg-build:
+	@make scm-version
+	@printf "🐍 \033[1;32m===> Building $(PROJECT_NAME) package...\033[0m\n"
+
+	@cd $(PROJECT_DIR)
+	@rm -rf dist;
+	@pdm build --dest $(PROJECT_DIR)/dist;
+
+.PHONY: pkg-publish
+## publish package to our pypi
+pkg-publish:
+	@printf "🐍 \033[1;32m===> Publishing $(PROJECT_NAME) package...\033[0m\n"
+	@cd ${PROJECT_DIR}
+	@NEXUS3_URL=$(NEXUS3_URL) \
+	NEXUS3_USERNAME=$(NEXUS3_USERNAME) \
+	NEXUS3_PASSWORD=$(NEXUS3_PASSWORD) \
+		nexus3 upload dist/*tar.gz $(PYPI_REPOSITORY_PATH)
+	@NEXUS3_URL=$(NEXUS3_URL) \
+	NEXUS3_USERNAME=$(NEXUS3_USERNAME) \
+	NEXUS3_PASSWORD=$(NEXUS3_PASSWORD) \
+		nexus3 upload dist/*.whl $(PYPI_REPOSITORY_PATH)
+
+.PHONY: build-image
+## build image
+build-image:
+	REGISTRY=${REGISTRY} IMAGE_NAME=${REPO} PROJECT_NAME=${PROJECT_NAME} ./build_image.sh .
+
+# use venv as IDE python env path
+# use `--add-host host.docker.internal:host-gateway` to enable container for connection to localhost
+# link: https://www.cloudsavvyit.com/14114/how-to-connect-to-localhost-within-a-docker-container/
+DOCKER_NETWORK := --add-host host.docker.internal:host-gateway
+
+.PHONY: local-ci-mac
+## run docker on mac
+local-ci-mac:
+	@printf "🐋 \033[1;32m===> Run command below to bash into docker...\033[0m\n"
+	docker run --pull=always $(DOCKER_NETWORK) -it --rm \
+	    --volume $(PROJECT_DIR):/$(PROJECT_NAME) \
+	    --env PYTHONPATH="/usr/lib/python38.zip:/usr/lib/python3.8:/usr/lib/python3.8/lib-dynload:/usr/local/lib/python3.8/dist-packages:/usr/lib/python3/dist-packages:/$(PROJECT_NAME)/__pypackages__/3.8/lib" \
+	    $(BASE_IMAGE) bash
+
+.PHONY: local-ci-linux
+## run docker on linux
+local-ci-linux: local-ci-mac DOCKER_NETWORK=--network=host
