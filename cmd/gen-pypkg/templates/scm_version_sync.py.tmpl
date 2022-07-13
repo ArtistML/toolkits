@@ -1,0 +1,7 @@
+from setuptools_scm import get_version
+from os.path import *
+
+if __name__ == "__main__":
+    version_path = dirname(abspath(__file__)) + '/scm_version.toml'
+    with open(version_path, mode='w') as fw:
+        fw.write(f"__version__=\"{get_version()}\"")

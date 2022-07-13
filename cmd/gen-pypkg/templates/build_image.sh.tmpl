@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -e
+
+if [ -z "$1" ]; then
+    echo usage: ./build_image.sh /path/to/repo
+    exit
+fi
+
+echo ""
+echo "------------------------------------"
+echo "           DOCKER BUILD"
+echo "------------------------------------"
+echo ""
+
+# Go into the directory representing the user's repo
+pushd "$1"
+
+# Grab the repo name from the argument if not already defined
+# Note that this repo name will be the name of the Docker image.
+if [ -z "${IMAGE_NAME}" ]; then
+  echo "Please provide IMAGE_NAME"
+  exit 1
+fi
+
+# Grab the repo name from the argument if not already defined
+# Note that this repo name will be the name of the Docker image.
+if [ -z "${PROJECT_NAME}" ]; then
+  echo "Please provide PROJECT_NAME"
+  exit 1
+fi
+
+# set default tag to the latest git SHA
+if [ -z "$TAG" ]; then
+  TAG=$(git rev-list --abbrev-commit HEAD -1)
+fi
+
+# If the registry does not exist, don't worry about it, and let users build locally
+# This is the name of the image that will be injected into the container as an environment variable
+if [ -n "$REGISTRY" ]; then
+  IMAGE=${REGISTRY}/${IMAGE_NAME}:${TAG}
+else
+  IMAGE=${IMAGE_NAME}:${TAG}
+fi
+echo "Building: $IMAGE"
+
+# This build command is the raison d'etre of this script, it ensures that the version is injected into the image itself
+docker build . --build-arg ALGO_VERSION="${TAG}" -t "$IMAGE_NAME"
+echo "$IMAGE_NAME built locally."
+
+# Create the appropriate tags
+docker tag "${IMAGE_NAME}:latest" "${IMAGE_NAME}:${TAG}"
+echo "${IMAGE_NAME}:latest also tagged with ${IMAGE_NAME}:${TAG}"
+if [ -n "$REGISTRY" ]; then
+  docker tag "${IMAGE_NAME}:latest" "${IMAGE}"
+  echo "${IMAGE_NAME}:latest also tagged with ${IMAGE}"
+
+  # Also push if there's a registry to push to
+  if [[ "${REGISTRY}" == "docker.io"*  && -z "${NOPUSH}" ]]; then
+    docker login --username="${DOCKERHUB_USERNAME}" --password="${DOCKERHUB_PASSWORD}"
+  fi
+
+  if [[ -z "${NOPUSH}" ]]; then
+    docker push "${IMAGE}"
+    echo "${IMAGE} pushed to remote"
+  fi
+fi
+
+popd
+
+echo ""
+echo "------------------------------------"
+echo "              SUCCESS"
+echo "------------------------------------"
+echo ""
