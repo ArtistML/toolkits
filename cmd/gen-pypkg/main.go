@@ -3,13 +3,13 @@ package main
 import (
 	"embed"
 	"fmt"
-	"github.com/jessevdk/go-flags"
 	"os"
 	"path"
 	"strings"
 	"text/template"
-)
 
+	"github.com/jessevdk/go-flags"
+)
 
 var (
 	// Example: params in example are invalid.

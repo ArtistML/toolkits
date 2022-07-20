@@ -2,3 +2,4 @@
 *gen.go
 *.DS_Store
 local/
+.vscode/
