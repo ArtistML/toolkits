@@ -5,7 +5,9 @@ go 1.18
 require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/gogf/gf v1.16.3
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0
 	github.com/jessevdk/go-flags v1.5.0
+	github.com/leventeliu/goproc v1.0.2-0.20210901044106-d6f0d77b9ce6
 	google.golang.org/grpc v1.46.0
 )
 
@@ -19,9 +21,7 @@ require (
 	github.com/gomodule/redigo v2.0.0+incompatible // indirect
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/grokify/html-strip-tags-go v0.0.0-20190921062105-daaa06bf1aaf // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
-	github.com/leventeliu/goproc v1.0.2-0.20210901044106-d6f0d77b9ce6 // indirect
 	github.com/mattn/go-runewidth v0.0.10 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/rivo/uniseg v0.1.0 // indirect
