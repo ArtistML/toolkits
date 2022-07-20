@@ -3,7 +3,6 @@ package main
 import (
 	"embed"
 	"fmt"
-	"github.com/jessevdk/go-flags"
 	"io/ioutil"
 	"os"
 	"path"
@@ -11,6 +10,8 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+
+	"github.com/jessevdk/go-flags"
 )
 
 const (
