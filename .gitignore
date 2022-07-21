@@ -1,5 +1,5 @@
 .idea/
-*gen.go
+*_gen.go
 *.DS_Store
 local/
 .vscode/

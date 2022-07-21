@@ -1,0 +1,39 @@
+# interceptor package for go list, rpc_gen.go will import all sub-packages in this package.
+interceptorPkg = "github.com/artistml/toolkits/pkg/interceptor"
+templates = ["gateway", "rpc"]
+
+# echo service
+[[services]]
+name = "echo"
+path = "pkg/services/echo"
+protoPkg = "github.com/artistml/toolkits/pkg/proto"
+[[services.protos]]
+pkg = "echo"
+version = "v1"
+rpcs = ["EchoService"]
+[[services.protos]]
+pkg = "echo"
+version = "v2"
+rpcs = ["EchoService"]
+[[services.protos]]
+pkg = "greeting"
+version = "v1"
+rpcs = ["GreetingService"]
+
+# greeting service
+[[services]]
+name = "greeting"
+path = "pkg/services/greeting"
+protoPkg = "github.com/artistml/toolkits/pkg/proto"
+[[services.protos]]
+pkg = "greeting"
+version = "v1"
+rpcs = ["EchoService", "GreetingService"]
+[[services.protos]]
+pkg = "greeting"
+version = "v2"
+rpcs = ["GreetingService"]
+[[services.protos]]
+pkg = "echo"
+version = "v1"
+rpcs = ["EchoService"]
