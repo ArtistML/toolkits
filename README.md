@@ -2,7 +2,7 @@
 
 ## handbook for gen-grpc
 1. create generate.go in service dir
-2. add go generate line in generate.go files, e.g.: [generate.go](./test/echo/generate.go)
+2. add go generate line in generate.go files, e.g.: [generate.go](./test/grpc/generate.go)
 
 ## handbook for gen-proto
 1. create common_resources.proto for each service proto, e.g.: [v1/common_resources.proto](./test/proto/echo/v1/common_resources.proto) [v2/common_resources.proto](./test/proto/echo/v2/common_resources.proto)
@@ -12,6 +12,6 @@
 5. add filters: `-f echo/v2 -f echo/v1` means generate CRUD api for echo/v2 and echo/v1 only.
 
 ## handbook for gen-pypkg
-1. `git clone git@github.com:ArtistML/toolkits.git`
-2. `cd tollkits.git`
+1. `git clone https://github.com/ArtistML/toolkits.git`
+2. `cd tollkits`
 3. create local/generate.go file to generate python package, e.g.: [generate.go](./test/pypkg/generate.go)
