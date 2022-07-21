@@ -1,0 +1,12 @@
+[project]
+projectPath = "/tmp/toolkits/toolkits-python"
+dockerBaseImage = "github.com/artistml/base-python:3.8.13"
+dockerRegistry = "github.com/artistml"
+nexusUrl = "http://github.com/artistml"
+nexusPassword = "artistml"
+nexusPypiPath = "pypi-hosted"
+pdmSourceName = "pypi"
+pdmSourceUrl = "http://github.com/artistml/repository/pypi-group/simple"
+pdmAuthorName = "artistml"
+pdmAuthorEmail = "artistml@github.com"
+pdmLicense = "ArtistML"

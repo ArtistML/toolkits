@@ -8,26 +8,33 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/gogf/gf/frame/g"
+	"github.com/gogf/gf/util/gconv"
 	"github.com/jessevdk/go-flags"
 )
 
+type ProjectConfig struct {
+	ProjectPath    string `required:"true" short:"p" long:"project-path" description:"Project path." json:"projectPath"`
+	ProjectName    string `required:"false" description:"Base name of project path, replace DASH(-) with UNDERLINE(_)." json:"projectName"`
+	BaseImage      string `required:"true" short:"i" long:"base-image" description:"Base image for create project image." json:"dockerBaseImage"`
+	Registry       string `required:"true" short:"r" long:"docker-registry" description:"Docker registry for create project image." json:"dockerRegistry"`
+	NexusUrl       string `required:"true" long:"nexus-url" description:"Nexus url for uploading python package." json:"nexusUrl"`
+	NexusUsername  string `required:"true" long:"nexus-username" description:"Nexus username for uploading python package." json:"nexusUsername"`
+	NexusPassword  string `required:"true" long:"nexus-password" description:"Nexus password for uploading python package." json:"nexusPassword"`
+	NexusPypiPath  string `required:"true" long:"nexus-pypi-path" description:"Nexus path for uploading python package." json:"nexusPypiPath"`
+	PdmSourceName  string `required:"true" long:"pdm-source-name" description:"Pdm source name." json:"pdmSourceName"`
+	PdmSourceUrl   string `required:"true" long:"pdm-source-url" description:"Pdm source url." json:"pdmSourceUrl"`
+	PdmAuthorName  string `required:"true" long:"pdm-author-name" description:"Pdm author name." json:"pdmAuthorName"`
+	PdmAuthorEmail string `required:"true" long:"pdm-author-email" description:"Pdm author email." json:"pdmAuthorEmail"`
+	PdmLicense     string `required:"true" long:"pdm-license" description:"Pdm license." json:"pdmLicense"`
+}
+
 var (
 	// Example: params in example are invalid.
-	// go run "github.com/artistml/toolkits/cmd/gen-pypkg" -p /tmp/toolkits/toolkits-python -i github.com/artistml/base-python:3.8.13 -r github.com/artistml --nexus-url=http://github.com/artistml --nexus-username=artistml --nexus-password=artistml-pw --nexus-pypi-path=pypi-hosted --pdm-source-name=pypi --pdm-source-url=http://github.com/artistml/repository/pypi-group/simple --pdm-author-name=artistml --pdm-author-email=artistml@github.com --pdm-license=ArtistML
+	// go run "github.com/artistml/toolkits/cmd/gen-pypkg" -c config
+	// go run "github.com/artistml/toolkits/cmd/gen-pypkg" -c $HOME/{project}/config
 	opts struct {
-		ProjectPath    string `required:"true" short:"p" long:"project-path" description:"Project path." json:"ProjectPath"`
-		ProjectName    string `required:"false" description:"Base name of project path, replace DASH(-) with UNDERLINE(_)." json:"ProjectName"`
-		BaseImage      string `required:"true" short:"i" long:"base-image" description:"Base image for create project image." json:"BaseImage"`
-		Registry       string `required:"true" short:"r" long:"docker-registry" description:"Docker registry for create project image." json:"Registry"`
-		NexusUrl       string `required:"true" long:"nexus-url" description:"Nexus url for uploading python package." json:"NexusUrl"`
-		NexusUsername  string `required:"true" long:"nexus-username" description:"Nexus username for uploading python package." json:"NexusUsername"`
-		NexusPassword  string `required:"true" long:"nexus-password" description:"Nexus password for uploading python package." json:"NexusPassword"`
-		NexusPypiPath  string `required:"true" long:"nexus-pypi-path" description:"Nexus path for uploading python package." json:"NexusPypiPath"`
-		PdmSourceName  string `required:"true" long:"pdm-source-name" description:"Pdm source name." json:"PdmSourceName"`
-		PdmSourceUrl   string `required:"true" long:"pdm-source-url" description:"Pdm source url." json:"PdmSourceUrl"`
-		PdmAuthorName  string `required:"true" long:"pdm-author-name" description:"Pdm author name." json:"PdmAuthorName"`
-		PdmAuthorEmail string `required:"true" long:"pdm-author-email" description:"Pdm author email." json:"PdmAuthorEmail"`
-		PdmLicense     string `required:"true" long:"pdm-license" description:"Pdm license." json:"PdmLicense"`
+		ConfigPath string `required:"true" short:"c" long:"config-path" description:"Config releactive path" json:"ConfigPath"`
 	}
 
 	//go:embed templates/*.tmpl
@@ -41,14 +48,25 @@ func checkErr(err error) {
 }
 
 func main() {
-	_, err := flags.Parse(&opts)
+	rootPath, err := os.Getwd()
 	checkErr(err)
-	err = os.MkdirAll(opts.ProjectPath, os.ModePerm)
+	_, err = flags.Parse(&opts)
 	checkErr(err)
-	opts.ProjectName = strings.ReplaceAll(path.Base(opts.ProjectPath), "-", "_")
-	err = os.MkdirAll(path.Join(opts.ProjectPath, opts.ProjectName), os.ModePerm)
+	if !strings.HasPrefix(opts.ConfigPath, "/") {
+		// use rootPath to join absolute path.
+		opts.ConfigPath = path.Join(rootPath, opts.ConfigPath)
+	}
+	err = g.Cfg().SetPath(opts.ConfigPath)
 	checkErr(err)
-	initPythonFile := path.Join(opts.ProjectPath, opts.ProjectName, "__init__.py")
+	projectConfig := ProjectConfig{}
+	gconv.Struct(g.Cfg().Get("project"), &projectConfig)
+
+	err = os.MkdirAll(projectConfig.ProjectPath, os.ModePerm)
+	checkErr(err)
+	projectConfig.ProjectName = strings.ReplaceAll(path.Base(projectConfig.ProjectPath), "-", "_")
+	err = os.MkdirAll(path.Join(projectConfig.ProjectPath, projectConfig.ProjectName), os.ModePerm)
+	checkErr(err)
+	initPythonFile := path.Join(projectConfig.ProjectPath, projectConfig.ProjectName, "__init__.py")
 	if _, err = os.Stat(initPythonFile); os.IsNotExist(err) {
 		_, err = os.Create(initPythonFile)
 		checkErr(err)
@@ -57,7 +75,7 @@ func main() {
 	checkErr(err)
 	for _, file := range templates.Templates() {
 		var (
-			output = path.Join(opts.ProjectPath, fmt.Sprintf("%s", file.Name()[:len(file.Name())-5]))
+			output = path.Join(projectConfig.ProjectPath, fmt.Sprintf("%s", file.Name()[:len(file.Name())-5]))
 		)
 		fmt.Printf("Generate file by tmp %s: %s\n", file.Name(), output)
 		func() {
@@ -74,7 +92,7 @@ func main() {
 				_ = f.Close()
 			}()
 
-			err = file.Execute(f, &opts)
+			err = file.Execute(f, &projectConfig)
 			checkErr(err)
 		}()
 
