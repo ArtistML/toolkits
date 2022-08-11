@@ -140,6 +140,7 @@ func main() {
 
 	var pkgPaths []string
 	err = filepath.Walk(rootPath, func(walkPath string, info os.FileInfo, err error) error {
+		fmt.Printf("rootPath: %s, walkPath: %s.\n", rootPath, walkPath)
 		if !info.IsDir() {
 			return nil
 		}
@@ -164,6 +165,11 @@ func main() {
 		pkgPaths = append(pkgPaths, walkPath)
 		return nil
 	})
+	checkErr(err)
+	fmt.Printf("pkgPaths: %s.\n", pkgPaths)
+	if len(pkgPaths) == 0 {
+		return
+	}
 	for _, pkgPath := range pkgPaths {
 		parentResource := readResource(path.Join(pkgPath, "common_resources.proto"))
 		if parentResource == nil {
@@ -227,6 +233,7 @@ func main() {
 			})
 			return nil
 		})
+		checkErr(err)
 	}
 
 	templates, err := template.ParseFS(fs, "templates/*.tmpl")
