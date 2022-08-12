@@ -10,19 +10,19 @@ import "{{.PackageName}}/v{{.PackageVersionNo}}/{{.EntityName}}.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "{{.CapitalEntityName}} Service";
-    version: "{{.PackageVersionNo}}.0";
+    title: "{{.CapitalEntityName}} Service"
+    version: "{{.PackageVersionNo}}.0"
     contact: {
-      name: "{{.CapitalEntityName}} Service";
-      url: "http://{{.DefaultHost}}/{{.ParentUriPattern}}";
+      name: "{{.CapitalEntityName}} Service"
+      url: "http://{{.DefaultHost}}/{{.ParentUriPattern}}"
     }
-  };
-  host: "{{.SwaggerHost}}";
-  base_path: "/{{.PackageName}}/v{{.PackageVersionNo}}/{{.EntityName}}";
-  schemes: HTTP;
-  schemes: HTTPS;
-  consumes: "application/json";
-  produces: "application/json";
+  }
+  host: "{{.SwaggerHost}}"
+  base_path: "/{{.PackageName}}/v{{.PackageVersionNo}}/{{.EntityName}}"
+  schemes: HTTP
+  schemes: HTTPS
+  consumes: "application/json"
+  produces: "application/json"
   external_docs: {
     description: "API specification in Markdown",
     url: "http://{{.SwaggerUrl}}/{{.PackageName}}/v{{.PackageVersionNo}}/{{.EntityName}}"
@@ -47,7 +47,7 @@ service {{.CapitalEntityName}}Service {
   rpc Get{{.CapitalEntityName}}(Get{{.CapitalEntityName}}Request) returns (Get{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      get: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s/{id=*}"
+      get: "/v{{.PackageVersionNo}}/{{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityName}}s/{id=*}"
     };
     option (google.api.method_signature) = "id";{{end}}
   }
@@ -56,7 +56,7 @@ service {{.CapitalEntityName}}Service {
   rpc Update{{.CapitalEntityName}}(Update{{.CapitalEntityName}}Request) returns (Update{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      patch: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s/{{.EntityIdExpr}}"
+      patch: "/v{{.PackageVersionNo}}/{{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityName}}s/{{.EntityIdExpr}}"
       body: "{{.EntityName}}"
     };
     option (google.api.method_signature) = "{{.EntityName}},update_mask";{{end}}
@@ -75,7 +75,7 @@ service {{.CapitalEntityName}}Service {
   rpc Delete{{.CapitalEntityName}}(Delete{{.CapitalEntityName}}Request) returns (Delete{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      delete: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s/{id=*}"
+      delete: "/v{{.PackageVersionNo}}/{{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityName}}s/{id=*}"
     };
     option (google.api.method_signature) = "id";{{end}}
   }
@@ -84,7 +84,7 @@ service {{.CapitalEntityName}}Service {
   rpc Delete{{.CapitalEntityName}}s(Delete{{.CapitalEntityName}}sRequest) returns (Delete{{.CapitalEntityName}}sResponse) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      patch: "/v{{.PackageVersionNo}}/{{.ParentUri}}/{{.EntityName}}s"
+      patch: "/v{{.PackageVersionNo}}/{{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityName}}s"
       body: "*"
     };{{end}}
   }
@@ -93,7 +93,7 @@ service {{.CapitalEntityName}}Service {
   rpc Import{{.CapitalEntityName}}(Import{{.CapitalEntityName}}Request) returns (Import{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      post: "/v{{.PackageVersionNo}}/{parent={{.ParentUri}}/{{.EntityName}}s}:import"
+      post: "/v{{.PackageVersionNo}}/{parent={{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityName}}s}:import"
       body: "*"
     };
     option (google.api.method_signature) = "parent,import_configs";{{end}}
@@ -103,7 +103,7 @@ service {{.CapitalEntityName}}Service {
   rpc Export{{.CapitalEntityName}}(Export{{.CapitalEntityName}}Request) returns (Export{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      post: "/v{{.PackageVersionNo}}/{parent={{.ParentUri}}/{{.EntityName}}s}:export"
+      post: "/v{{.PackageVersionNo}}/{parent={{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityName}}s}:export"
       body: "*"
     };
     option (google.api.method_signature) = "parent,export_config";{{end}}
