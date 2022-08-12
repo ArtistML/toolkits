@@ -37,7 +37,7 @@ service {{.CapitalEntityName}}Service {
   rpc Create{{.CapitalEntityName}}(Create{{.CapitalEntityName}}Request) returns (Create{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      post: "/v{{.PackageVersionNo}}/{parent={{.ParentUri}}}/{{.EntityName}}s"
+      post: "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityName}}s"
       body: "{{.EntityName}}"
     };
     option (google.api.method_signature) = "parent,{{.EntityName}}";{{end}}
@@ -66,7 +66,7 @@ service {{.CapitalEntityName}}Service {
   rpc List{{.CapitalEntityName}}s(List{{.CapitalEntityName}}sRequest) returns (List{{.CapitalEntityName}}sResponse) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      get: "/v{{.PackageVersionNo}}/{parent={{.ParentUri}}}/{{.EntityName}}s"
+      get: "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityName}}s"
     };
     option (google.api.method_signature) = "parent";{{end}}
   }
