@@ -41,7 +41,7 @@ service GreetingEntityService {
   rpc CreateGreetingEntity(CreateGreetingEntityRequest) returns (CreateGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      post: "/v1/{parent=}/greeting_entitys"
+      post: "/v1/greeting_entitys"
       body: "greeting_entity"
     };
     option (google.api.method_signature) = "parent,greeting_entity";
@@ -70,7 +70,7 @@ service GreetingEntityService {
   rpc ListGreetingEntitys(ListGreetingEntitysRequest) returns (ListGreetingEntitysResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      get: "/v1/{parent=}/greeting_entitys"
+      get: "/v1/greeting_entitys"
     };
     option (google.api.method_signature) = "parent";
   }
