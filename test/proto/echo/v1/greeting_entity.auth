@@ -1,0 +1,2 @@
+authImport: import "auth/v1/options.proto";
+authOption: option (auth.v1.auth_options) = {require_authentication: true};

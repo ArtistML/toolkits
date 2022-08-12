@@ -14,19 +14,19 @@ import "echo/v2/greeting.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "Greeting Service";
-    version: "2.0";
+    title: "Greeting Service"
+    version: "2.0"
     contact: {
-      name: "Greeting Service";
-      url: "http://github.com/artistml/toolkits/echos";
+      name: "Greeting Service"
+      url: "http://github.com/artistml/toolkits/echos"
     }
-  };
-  host: "github.com/artistml/toolkits";
-  base_path: "/echo/v2/greeting";
-  schemes: HTTP;
-  schemes: HTTPS;
-  consumes: "application/json";
-  produces: "application/json";
+  }
+  host: "github.com/artistml/toolkits"
+  base_path: "/echo/v2/greeting"
+  schemes: HTTP
+  schemes: HTTPS
+  consumes: "application/json"
+  produces: "application/json"
   external_docs: {
     description: "API specification in Markdown",
     url: "http://github.com/artistml/toolkits/echo/v2/greeting"

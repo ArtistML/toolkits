@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -68,6 +69,7 @@ var (
 		"types.proto":            true,
 		"enums.proto":            true,
 	}
+	wordRegexp = regexp.MustCompile(`[a-zA-Z][a-zA-Z\d]*`)
 )
 
 func checkErr(err error) {
@@ -76,17 +78,37 @@ func checkErr(err error) {
 	}
 }
 
-func readLines(messageFile string, filters []string) ([]string, map[string][]int) {
-	body, err := ioutil.ReadFile(messageFile)
-	checkErr(err)
-	bodyStr := string(body)
-	lines := strings.Split(bodyStr, "\n")
+func getCapitalEntityName(entityName string) string {
+	capitalEntityName := ""
+	for _, word := range wordRegexp.FindAll([]byte(entityName), -1) {
+		w := strings.ToUpper(string(word[:1]))
+		w = w + string(word[1:])
+		capitalEntityName = capitalEntityName + w
+	}
+	fmt.Println("capitalEntityName", capitalEntityName)
+	return capitalEntityName
+}
+
+func readLines(messageFile string, filters map[string]string) ([]string, map[string][]int) {
+	fileExtension := filepath.Ext(messageFile)
+	authFile := strings.ReplaceAll(messageFile, fileExtension, ".auth")
+	lines := []string{}
+	for _, filePath := range []string{messageFile, authFile} {
+		if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {
+			continue
+		}
+		body, err := ioutil.ReadFile(filePath)
+		checkErr(err)
+		bodyStr := string(body)
+		lines = append(lines, strings.Split(bodyStr, "\n")...)
+	}
+
 	if len(filters) == 0 {
 		return lines, make(map[string][]int)
 	}
 	output := make(map[string][]int)
 	for i, line := range lines {
-		for _, filter := range filters {
+		for filter, value := range filters {
 			if !strings.Contains(line, filter) {
 				continue
 			}
@@ -94,15 +116,14 @@ func readLines(messageFile string, filters []string) ([]string, map[string][]int
 			if !ok {
 				output[filter] = []int{}
 			}
-			output[filter] = append(output[filter], i)
+			output[value] = append(output[value], i)
 		}
-
 	}
 	return lines, output
 }
 
 func readResource(messageFile string) *ApiResource {
-	lines, matchFilters := readLines(messageFile, []string{"google.api.resource", "type:", "pattern:", "authImport", "authOption"})
+	lines, matchFilters := readLines(messageFile, map[string]string{"google.api.resource": "google.api.resource", "type:": "type:", "type :": "type:", "pattern:": "pattern:", "pattern :": "pattern:", "authImport": "authImport", "authOption": "authOption"})
 	if _, ok := matchFilters["google.api.resource"]; !ok {
 		return nil
 	}
@@ -190,9 +211,15 @@ func main() {
 			if _, ok := ignoreFiles[path.Base(walkPath)]; ok {
 				return nil
 			}
-			entityName := strings.Split(path.Base(walkPath), ".")[0]
+			items := strings.Split(path.Base(walkPath), ".")
+			entityName := items[0]
+			suffix := items[1]
 			if pkgName == entityName {
 				// 对于与 model 同名的 entity，认为是自定义的服务，不需要再生成 service
+				return nil
+			}
+			if suffix == "auth" {
+				// 对于 {entity}.auth 这样用于 {entity} 登录验证所使用的配置，不需要生成 service
 				return nil
 			}
 
@@ -205,9 +232,9 @@ func main() {
 					os.Exit(1)
 				}
 			}
-			capitalEntityName := strings.ToUpper(entityName[:1]) + entityName[1:]
+			capitalEntityName := getCapitalEntityName(entityName)
 			importConfigName, exportConfigName := fmt.Sprintf("Import%sConfig", capitalEntityName), fmt.Sprintf("Export%sConfig", capitalEntityName)
-			lines, matchFilters := readLines(walkPath, []string{"import", importConfigName, exportConfigName})
+			lines, matchFilters := readLines(walkPath, map[string]string{"import": "import", importConfigName: importConfigName, exportConfigName: exportConfigName})
 			i := matchFilters["import"][0]
 			headers := strings.Join(lines[:i], "\n")
 			_, hasImportRequest := matchFilters[importConfigName]

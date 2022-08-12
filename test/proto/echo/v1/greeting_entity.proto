@@ -5,12 +5,10 @@ option go_package = "github.com/artistml/echo/v1;echoV1";
 import "google/protobuf/timestamp.proto";
 import "google/api/resource.proto";
 
-message Greeting {
+message GreetingEntity {
   option (google.api.resource) = {
-    // authImport: import "auth/v1/options.proto";
-    // authOption: option (auth.v1.auth_options) = {require_authentication: true};
-    type: "github.com.artistml/Greeting"
-    pattern: "echos/{echo_id}/greetings/{id}"
+    type : "github.com.artistml/GreetingEntity"
+    pattern : "greeting_entitys/{id}"
   };
 
   // auto increase id.
@@ -25,15 +23,11 @@ message Greeting {
   string greeting = 4;
 }
 
-message GreetingFilter {
+message GreetingEntityFilter {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
 }
 
-message ImportGreetingConfig {
-  string file_path = 1;
-}
+message ImportGreetingEntityConfig { string file_path = 1; }
 
-message ExportGreetingConfig {
-  string file_path = 1;
-}
+message ExportGreetingEntityConfig { string file_path = 1; }

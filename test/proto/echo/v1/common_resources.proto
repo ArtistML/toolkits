@@ -5,6 +5,6 @@ option go_package = "github.com/artistml/echo/v1;echoV1";
 import "google/api/resource.proto";
 
 option (google.api.resource_definition) = {
-  type: "github.com.artistml/Echo"
-  pattern: "echos/{echo_id}"
+  type : "github.com.artistml/Echo"
+  pattern : ""
 };
