@@ -28,6 +28,8 @@ message GreetingEntityFilter {
   google.protobuf.Timestamp end_time = 2;
 }
 
+message GreetingEntityListOption {}
+
 message ImportGreetingEntityConfig { string file_path = 1; }
 
 message ExportGreetingEntityConfig { string file_path = 1; }

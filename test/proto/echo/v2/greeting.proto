@@ -5,10 +5,9 @@ option go_package = "github.com/artistml/echo/v2;echoV2";
 import "google/protobuf/timestamp.proto";
 import "google/api/resource.proto";
 
-
 message Greeting {
   // auto increase id.
-  int64 id = 1 ;
+  int64 id = 1;
 
   // Output only. Timestamp when this Dataset was created.
   google.protobuf.Timestamp create_time = 2;
@@ -24,6 +23,6 @@ message GreetingFilter {
   google.protobuf.Timestamp end_time = 2;
 }
 
-message ImportGreetingConfig {
-  string file_path = 1;
-}
+message GreetingListOption {}
+
+message ImportGreetingConfig { string file_path = 1; }

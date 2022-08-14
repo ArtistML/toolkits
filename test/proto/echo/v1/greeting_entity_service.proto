@@ -13,23 +13,23 @@ import "auth/v1/options.proto";
 import "echo/v1/greeting_entity.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
-  info: {
-    title: "GreetingEntity Service"
-    version: "1.0"
-    contact: {
-      name: "GreetingEntity Service"
-      url: "http://github.com/artistml/toolkits/"
+  info : {
+    title : "GreetingEntity Service"
+    version : "1.0"
+    contact : {
+      name : "GreetingEntity Service"
+      url : "http://github.com/artistml/toolkits/"
     }
   }
-  host: "github.com/artistml/toolkits"
-  base_path: "/echo/v1/greeting_entity"
-  schemes: HTTP
-  schemes: HTTPS
-  consumes: "application/json"
-  produces: "application/json"
-  external_docs: {
-    description: "API specification in Markdown",
-    url: "http://github.com/artistml/toolkits/echo/v1/greeting_entity"
+  host : "github.com/artistml/toolkits"
+  base_path : "/echo/v1/greeting_entity"
+  schemes : HTTP
+  schemes : HTTPS
+  consumes : "application/json"
+  produces : "application/json"
+  external_docs : {
+    description : "API specification in Markdown",
+    url : "http://github.com/artistml/toolkits/echo/v1/greeting_entity"
   }
 };
 
@@ -38,77 +38,85 @@ service GreetingEntityService {
 
   option (google.api.default_host) = "github.com/artistml/toolkits";
   // Creates a GreetingEntity.
-  rpc CreateGreetingEntity(CreateGreetingEntityRequest) returns (CreateGreetingEntityResponse) {
+  rpc CreateGreetingEntity(CreateGreetingEntityRequest)
+      returns (CreateGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      post: "/v1/greeting_entitys"
-      body: "greeting_entity"
+      post : "/v1/greeting_entitys"
+      body : "greeting_entity"
     };
     option (google.api.method_signature) = "parent,greeting_entity";
   }
 
   // Gets a GreetingEntity.
-  rpc GetGreetingEntity(GetGreetingEntityRequest) returns (GetGreetingEntityResponse) {
+  rpc GetGreetingEntity(GetGreetingEntityRequest)
+      returns (GetGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      get: "/v1/greeting_entitys/{id=*}"
+      get : "/v1/greeting_entitys/{id=*}"
     };
     option (google.api.method_signature) = "id";
   }
 
   // Updates a GreetingEntity.
-  rpc UpdateGreetingEntity(UpdateGreetingEntityRequest) returns (UpdateGreetingEntityResponse) {
+  rpc UpdateGreetingEntity(UpdateGreetingEntityRequest)
+      returns (UpdateGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      patch: "/v1/greeting_entitys/{greeting_entity.id=*}"
-      body: "greeting_entity"
+      patch : "/v1/greeting_entitys/{greeting_entity.id=*}"
+      body : "greeting_entity"
     };
     option (google.api.method_signature) = "greeting_entity,update_mask";
   }
 
   // Lists GreetingEntitys in a Location.
-  rpc ListGreetingEntitys(ListGreetingEntitysRequest) returns (ListGreetingEntitysResponse) {
+  rpc ListGreetingEntitys(ListGreetingEntitysRequest)
+      returns (ListGreetingEntitysResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      get: "/v1/greeting_entitys"
+      get : "/v1/greeting_entitys"
     };
     option (google.api.method_signature) = "parent";
   }
 
   // Deletes a GreetingEntity.
-  rpc DeleteGreetingEntity(DeleteGreetingEntityRequest) returns (DeleteGreetingEntityResponse) {
+  rpc DeleteGreetingEntity(DeleteGreetingEntityRequest)
+      returns (DeleteGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      delete: "/v1/greeting_entitys/{id=*}"
+      delete : "/v1/greeting_entitys/{id=*}"
     };
     option (google.api.method_signature) = "id";
   }
 
   // Batch delete GreetingEntity by filter.
-  rpc DeleteGreetingEntitys(DeleteGreetingEntitysRequest) returns (DeleteGreetingEntitysResponse) {
+  rpc DeleteGreetingEntitys(DeleteGreetingEntitysRequest)
+      returns (DeleteGreetingEntitysResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      patch: "/v1/greeting_entitys"
-      body: "*"
+      patch : "/v1/greeting_entitys"
+      body : "*"
     };
   }
 
   // Imports a GreetingEntity.
-  rpc ImportGreetingEntity(ImportGreetingEntityRequest) returns (ImportGreetingEntityResponse) {
+  rpc ImportGreetingEntity(ImportGreetingEntityRequest)
+      returns (ImportGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      post: "/v1/{parent=greeting_entitys}:import"
-      body: "*"
+      post : "/v1/{parent=greeting_entitys}:import"
+      body : "*"
     };
     option (google.api.method_signature) = "parent,import_configs";
   }
 
   // Exports a GreetingEntity.
-  rpc ExportGreetingEntity(ExportGreetingEntityRequest) returns (ExportGreetingEntityResponse) {
+  rpc ExportGreetingEntity(ExportGreetingEntityRequest)
+      returns (ExportGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      post: "/v1/{parent=greeting_entitys}:export"
-      body: "*"
+      post : "/v1/{parent=greeting_entitys}:export"
+      body : "*"
     };
     option (google.api.method_signature) = "parent,export_config";
   }
@@ -117,7 +125,7 @@ service GreetingEntityService {
 // Request message for [GreetingEntityService.CreateGreetingEntity][v1.GreetingEntityService.CreateGreetingEntity].
 message CreateGreetingEntityRequest {
   // Required. The resource name of the ParentUri to create the GreetingEntity in.
-  // Format: ``
+  // Format : ``
   string parent = 1;
 
   // Required. The GreetingEntity to create.
@@ -181,7 +189,7 @@ message UpdateGreetingEntityResponse {
 // Request message for [GreetingEntityService.ListGreetingEntitys][v1.GreetingEntityService.ListGreetingEntitys].
 message ListGreetingEntitysRequest {
   // Required. The name of the GreetingEntity's parent resource.
-  // Format: ``
+  // Format : ``
   string parent = 1;
 
   // The standard page number, start with zero, use cursor or size as page rotation.
@@ -206,8 +214,14 @@ message ListGreetingEntitysRequest {
   //   * `update_at`
   string order_by = 7;
 
+  // A comma-separated list of fields to group by
+  string group_by = 8;
+
   // filter struct for list.
-  GreetingEntityFilter f = 8;
+  GreetingEntityFilter f = 9;
+
+  // option struct for list.
+  GreetingEntityListOption o = 10;
 }
 
 // Response message for [GreetingEntityService.ListGreetingEntitys][v1.GreetingEntityService.ListGreetingEntitys].
