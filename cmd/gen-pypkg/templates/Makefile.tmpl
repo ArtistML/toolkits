@@ -132,5 +132,6 @@ local-ci-mac:
 	    $(BASE_IMAGE) bash
 
 .PHONY: local-ci-linux
+DOCKER_NETWORK := --network host
 ## run docker on linux
-local-ci-linux: local-ci-mac DOCKER_NETWORK=--network=host
+local-ci-linux: local-ci-mac
