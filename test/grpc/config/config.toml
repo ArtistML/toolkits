@@ -24,16 +24,23 @@ rpcs = ["GreetingService"]
 [[services]]
 name = "greeting"
 path = "pkg/services/greeting"
-protoPkg = "github.com/artistml/toolkits/pkg/proto"
 [[services.protos]]
+protoPkg = "github.com/artistml/toolkits/pkg/proto"
 pkg = "greeting"
 version = "v1"
 rpcs = ["EchoService", "GreetingService"]
 [[services.protos]]
+protoPkg = "github.com/artistml/toolkits/pkg/proto"
 pkg = "greeting"
 version = "v2"
 rpcs = ["GreetingService"]
 [[services.protos]]
+protoPkg = "github.com/artistml/toolkits/pkg/proto"
 pkg = "echo"
 version = "v1"
 rpcs = ["EchoService"]
+[[services.protos]]
+protoPkg = "github.com/artistml/toolkits/pkg/proto"
+pkg = "hello"
+version = ""
+rpcs = ["HelloService"]

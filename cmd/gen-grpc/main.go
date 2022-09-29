@@ -21,10 +21,11 @@ const (
 type ServerConfig struct {
 	Name           string   `required:"true" json:"name"`
 	Path           string   `required:"true" json:"path"`
-	ProtoPkg       string   `required:"true" json:"protoPkg"`
+	ProtoPkg       string   `required:"false" json:"protoPkg"`
 	InterceptorPkg string   `required:"true" json:"interceptorPkg"`
 	Intercepters   []string `required:"true" json:"intercepters"`
 	Protos         []struct {
+		ProtoPkg       string   `required:"false" json:"protoPkg"`
 		Pkg     string   `required:"true" json:"pkg"`
 		Version string   `required:"true" json:"version"`
 		Rpcs    []string `required:"true" json:"rpcs"`
@@ -103,9 +104,17 @@ func main() {
 		for _, proto := range server.Protos {
 			for _, rpc := range proto.Rpcs {
 				config.RegisterHandlerMethods = append(config.RegisterHandlerMethods, fmt.Sprintf("%s%s.Register%s", proto.Pkg, proto.Version, rpc))
-				config.RegisterServerMethods = append(config.RegisterServerMethods, fmt.Sprintf("%s%s.Register%sServer(rpc, srv.(%s%s.%sServer))", proto.Pkg, proto.Version, rpc, config.PackageName, proto.Version, rpc))
+				config.RegisterServerMethods = append(config.RegisterServerMethods, fmt.Sprintf("%s%s.Register%sServer(rpc, srv.(%s%s.%sServer))", proto.Pkg, proto.Version, rpc, proto.Pkg, proto.Version, rpc))
 			}
-			config.Imports = append(config.Imports, fmt.Sprintf("%s%s \"%s/%s/%s\"", proto.Pkg, proto.Version, server.ProtoPkg, proto.Pkg, proto.Version))
+			version := ""
+			if len(proto.Version) > 0 {
+				version = fmt.Sprintf("/%s", proto.Version)
+			}
+			protoPkg := server.ProtoPkg
+			if len(proto.ProtoPkg) > 0 {
+				protoPkg = proto.ProtoPkg
+			}
+			config.Imports = append(config.Imports, fmt.Sprintf("%s%s \"%s/%s%s\"", proto.Pkg, proto.Version, protoPkg, proto.Pkg, version))
 		}
 		serversConfig = append(serversConfig, config)
 	}
