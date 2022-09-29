@@ -24,6 +24,7 @@ rpcs = ["GreetingService"]
 [[services]]
 name = "greeting"
 path = "pkg/services/greeting"
+grpcRuntimePkg = "github.com/grpc-ecosystem/grpc-gateway/runtime"
 [[services.protos]]
 protoPkg = "github.com/artistml/toolkits/pkg/proto"
 pkg = "greeting"
