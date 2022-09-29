@@ -8,30 +8,29 @@ import (
 	"time"
 
 	"github.com/gogf/gf/frame/g"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/leventeliu/goproc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
 	{{range .Imports}}{{.}}
 	{{end}}
-	customGrpc "github.com/artistml/toolkits/pkg/lib/grpc"
+	customgrpc "github.com/artistml/toolkits/pkg/lib/grpc"
 )
 
 // RunGateway loads config and runs gateway instances.
 func RunGateway(ctx context.Context) {
-	var serverConfigs []customGrpc.GatewayServerConfig
-	serverConfig, ok := ctx.Value(customGrpc.GatewayServerKey).(*customGrpc.GatewayServerConfig)
+	var serverConfigs []customgrpc.GatewayServerConfig
+	serverConfig, ok := ctx.Value(customgrpc.GatewayServerKey).(*customgrpc.GatewayServerConfig)
 	if ok {
 		serverConfigs = append(serverConfigs, *serverConfig)
 	} else {
-		err := g.Cfg().GetJson(customGrpc.GatewayServerKey).Structs(&serverConfigs)
+		err := g.Cfg().GetJson(customgrpc.GatewayServerKey).Structs(&serverConfigs)
 		if err != nil {
 			g.Log().Fatalf("failed to parse rpc server configs: %s", err)
 		}
 	}
 
-	ctrl := goproc.NewController(ctx, customGrpc.GatewayServerKey)
+	ctrl := goproc.NewController(ctx, customgrpc.GatewayServerKey)
 	defer ctrl.Wait()
 	for i := range serverConfigs {
 		ctrl.WithValue("config", &serverConfigs[i]).Go(ServeGateway)
@@ -39,9 +38,9 @@ func RunGateway(ctx context.Context) {
 }
 
 func ServeGateway(ctx context.Context) {
-	cfg := ctx.Value("config").(*customGrpc.GatewayServerConfig)
-	mux := runtime.NewServeMux()
-	defaultReceiveSize, defaultSendSize := customGrpc.GetReceiveAndSendMsgSize()
+	cfg := ctx.Value("config").(*customgrpc.GatewayServerConfig)
+	mux := grpcruntime.NewServeMux()
+	defaultReceiveSize, defaultSendSize := customgrpc.GetReceiveAndSendMsgSize()
 	g.Log().Infof("defaultReceiveSize = %d, defaultSendSize = %d", defaultReceiveSize, defaultSendSize)
 	defaultServiceConfig := fmt.Sprintf("{\"method_config\":[{\"max_request_message_bytes\":%d,\"max_response_message_bytes\":%d}]}", defaultReceiveSize, defaultSendSize)
 	opts := []grpc.DialOption{

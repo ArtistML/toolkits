@@ -15,13 +15,13 @@ import (
 	{{range .InterceptorPackages}}_ "{{.}}"
 	{{end}}
 	"github.com/artistml/toolkits/pkg/lib/grpc/interceptor"
-	customGrpc "github.com/artistml/toolkits/pkg/lib/grpc"
+	customgrpc "github.com/artistml/toolkits/pkg/lib/grpc"
 )
 
 func loadUnaryInterceptors(ctx context.Context) (its []grpc.UnaryServerInterceptor) {
-	names, ok := ctx.Value(customGrpc.UnaryServerInterceptorsKey).([]string)
+	names, ok := ctx.Value(customgrpc.UnaryServerInterceptorsKey).([]string)
 	if !ok {
-		names = g.Cfg().GetStrings(customGrpc.UnaryServerInterceptorsKey)
+		names = g.Cfg().GetStrings(customgrpc.UnaryServerInterceptorsKey)
 	}
 	for _, name := range names {
 		it, ok := interceptor.GetUnary(name)
@@ -35,9 +35,9 @@ func loadUnaryInterceptors(ctx context.Context) (its []grpc.UnaryServerIntercept
 }
 
 func loadStreamInterceptors(ctx context.Context) (its []grpc.StreamServerInterceptor) {
-	names, ok := ctx.Value(customGrpc.StreamServerInterceptorsKey).([]string)
+	names, ok := ctx.Value(customgrpc.StreamServerInterceptorsKey).([]string)
 	if !ok {
-		names = g.Cfg().GetStrings(customGrpc.StreamServerInterceptorsKey)
+		names = g.Cfg().GetStrings(customgrpc.StreamServerInterceptorsKey)
 	}
 	for _, name := range names {
 		it, ok := interceptor.GetStream(name)
@@ -53,7 +53,7 @@ func loadStreamInterceptors(ctx context.Context) (its []grpc.StreamServerInterce
 // RunRPC loads config and runs an RPC server to serve endpoints.
 func RunRPC(ctx context.Context) {
 	srv := ctx.Value("server")
-	defaultReceiveSize, defaultSendSize := customGrpc.GetReceiveAndSendMsgSize()
+	defaultReceiveSize, defaultSendSize := customgrpc.GetReceiveAndSendMsgSize()
 	g.Log().Infof("defaultReceiveSize = %d, defaultSendSize = %d", defaultReceiveSize, defaultSendSize)
 
 	rpc := grpc.NewServer(
@@ -65,12 +65,12 @@ func RunRPC(ctx context.Context) {
 	)
 	{{range .RegisterServerMethods}}{{.}}
 	{{end}}
-	var serverConfigs []customGrpc.ServerConfig
-	serverConfig, ok := ctx.Value(customGrpc.ServerKey).(*customGrpc.ServerConfig)
+	var serverConfigs []customgrpc.ServerConfig
+	serverConfig, ok := ctx.Value(customgrpc.ServerKey).(*customgrpc.ServerConfig)
 	if ok {
 		serverConfigs = append(serverConfigs, *serverConfig)
 	} else {
-		err := g.Cfg().GetJson(customGrpc.ServerKey).Structs(&serverConfigs)
+		err := g.Cfg().GetJson(customgrpc.ServerKey).Structs(&serverConfigs)
 		if err != nil {
 			g.Log().Fatalf("failed to parse rpc server configs: %s", err)
 		}
@@ -92,7 +92,7 @@ func RunRPC(ctx context.Context) {
 
 func serveRPC(ctx context.Context) {
 	rpc := ctx.Value("server").(*grpc.Server)
-	cfg := ctx.Value("config").(*customGrpc.ServerConfig)
+	cfg := ctx.Value("config").(*customgrpc.ServerConfig)
 
 	g.Log().Infof("starting grpc server: name=%s address=%s@%s", cfg.Name, cfg.Network, cfg.Address)
 	listener, err := net.Listen(cfg.Network, cfg.Address)
