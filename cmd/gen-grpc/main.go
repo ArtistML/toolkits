@@ -41,6 +41,7 @@ type Config struct {
 	RegisterHandlerMethods []string `json:"RegisterHandlerMethods"`
 	RegisterServerMethods  []string `json:"RegisterServerMethods"`
 	Imports                []string `json:"Imports"`
+	GrpcRuntimePkg         string   `required:"false" json:"grpcRuntimePkg"`
 }
 
 var (
@@ -121,7 +122,7 @@ func main() {
 		if len(server.GrpcRuntimePkg) == 0 {
 			server.GrpcRuntimePkg = defaultRuntimePkg
 		}
-		config.Imports = append(config.Imports, fmt.Sprintf("grpcruntime \"%s\"", server.GrpcRuntimePkg))
+		config.GrpcRuntimePkg = server.GrpcRuntimePkg
 		serversConfig = append(serversConfig, config)
 	}
 

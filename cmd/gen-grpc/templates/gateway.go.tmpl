@@ -11,6 +11,7 @@ import (
 	"github.com/leventeliu/goproc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	grpcruntime "{{.GrpcRuntimePkg}}"
 
 	{{range .Imports}}{{.}}
 	{{end}}
