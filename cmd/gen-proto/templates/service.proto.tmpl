@@ -1,6 +1,5 @@
 {{.EntityHeaders}}
-
-import "google/api/annotations.proto";
+{{if .EntityResourcePattern}}import "google/api/annotations.proto";{{end}}
 import "google/api/client.proto";
 import "google/protobuf/field_mask.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
