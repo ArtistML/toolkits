@@ -3,7 +3,6 @@ syntax = "proto3";
 package echo.v1;
 option go_package = "github.com/artistml/echo/v1;echoV1";
 
-
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/protobuf/field_mask.proto";

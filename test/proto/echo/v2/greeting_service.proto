@@ -4,7 +4,6 @@ package echo.v2;
 option go_package = "github.com/artistml/echo/v2;echoV2";
 
 
-import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/protobuf/field_mask.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
