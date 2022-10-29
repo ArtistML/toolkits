@@ -17,7 +17,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     version : "2.0"
     contact : {
       name : "Greeting Service"
-      url : "http://github.com/artistml/toolkits/echos"
+      url : "http://github.com/artistml/toolkits"
     }
   }
   host : "github.com/artistml/toolkits"
@@ -83,7 +83,7 @@ service GreetingService {
 // Request message for [GreetingService.CreateGreeting][v2.GreetingService.CreateGreeting].
 message CreateGreetingRequest {
   // Required. The resource name of the ParentUri to create the Greeting in.
-  // Format : `echos`
+  // Format : ``
   string parent = 1;
 
   // Required. The Greeting to create.
@@ -147,7 +147,7 @@ message UpdateGreetingResponse {
 // Request message for [GreetingService.ListGreetings][v2.GreetingService.ListGreetings].
 message ListGreetingsRequest {
   // Required. The name of the Greeting's parent resource.
-  // Format : `echos`
+  // Format : ``
   string parent = 1;
 
   // The standard page number, start with zero, use cursor or size as page rotation.
@@ -242,7 +242,7 @@ message DeleteGreetingsResponse {
 message ImportGreetingRequest {
   // Required. The name of the Greeting resource.
   // Format:
-  // `echos/greetings`
+  // `/`
   string parent = 1;
 
   // Required. The desired input configs. The contents of all input configs will be

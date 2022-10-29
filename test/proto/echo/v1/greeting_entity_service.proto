@@ -17,7 +17,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     version : "1.0"
     contact : {
       name : "GreetingEntity Service"
-      url : "http://github.com/artistml/toolkits/"
+      url : "http://github.com/artistml/toolkits"
     }
   }
   host : "github.com/artistml/toolkits"
@@ -41,7 +41,7 @@ service GreetingEntityService {
       returns (CreateGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      post : "/v1/greeting_entitys"
+      post : "/v1/{parent=echo/*}/greeting_entities"
       body : "greeting_entity"
     };
     option (google.api.method_signature) = "parent,greeting_entity";
@@ -52,9 +52,9 @@ service GreetingEntityService {
       returns (GetGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      get : "/v1/greeting_entitys/{id=*}"
+      get : "/v1/echo/*/greeting_entities/{name=*}"
     };
-    option (google.api.method_signature) = "id";
+    option (google.api.method_signature) = "name";
   }
 
   // Updates a GreetingEntity.
@@ -62,7 +62,7 @@ service GreetingEntityService {
       returns (UpdateGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      patch : "/v1/greeting_entitys/{greeting_entity.id=*}"
+      patch : "/v1/echo/*/greeting_entities/{greeting_entity.name=*}"
       body : "greeting_entity"
     };
     option (google.api.method_signature) = "greeting_entity,update_mask";
@@ -73,7 +73,7 @@ service GreetingEntityService {
       returns (ListGreetingEntitysResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      get : "/v1/greeting_entitys"
+      get : "/v1/{parent=echo/*}/greeting_entities"
     };
     option (google.api.method_signature) = "parent";
   }
@@ -83,9 +83,9 @@ service GreetingEntityService {
       returns (DeleteGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      delete : "/v1/greeting_entitys/{id=*}"
+      delete : "/v1/echo/*/greeting_entities/{name=*}"
     };
-    option (google.api.method_signature) = "id";
+    option (google.api.method_signature) = "name";
   }
 
   // Batch delete GreetingEntity by filter.
@@ -93,7 +93,7 @@ service GreetingEntityService {
       returns (DeleteGreetingEntitysResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      patch : "/v1/greeting_entitys"
+      patch : "/v1/echo/*/greeting_entities"
       body : "*"
     };
   }
@@ -103,7 +103,7 @@ service GreetingEntityService {
       returns (ImportGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      post : "/v1/{parent=greeting_entitys}:import"
+      post : "/v1/{parent=echo/*/greeting_entities}:import"
       body : "*"
     };
     option (google.api.method_signature) = "parent,import_configs";
@@ -114,7 +114,7 @@ service GreetingEntityService {
       returns (ExportGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      post : "/v1/{parent=greeting_entitys}:export"
+      post : "/v1/{parent=echo/*/greeting_entities}:export"
       body : "*"
     };
     option (google.api.method_signature) = "parent,export_config";
@@ -124,7 +124,7 @@ service GreetingEntityService {
 // Request message for [GreetingEntityService.CreateGreetingEntity][v1.GreetingEntityService.CreateGreetingEntity].
 message CreateGreetingEntityRequest {
   // Required. The resource name of the ParentUri to create the GreetingEntity in.
-  // Format : ``
+  // Format : `echo/*`
   string parent = 1;
 
   // Required. The GreetingEntity to create.
@@ -188,7 +188,7 @@ message UpdateGreetingEntityResponse {
 // Request message for [GreetingEntityService.ListGreetingEntitys][v1.GreetingEntityService.ListGreetingEntitys].
 message ListGreetingEntitysRequest {
   // Required. The name of the GreetingEntity's parent resource.
-  // Format : ``
+  // Format : `echo/*`
   string parent = 1;
 
   // The standard page number, start with zero, use cursor or size as page rotation.
@@ -248,7 +248,7 @@ message ListGreetingEntitysResponse {
 message DeleteGreetingEntityRequest {
   // Required. The resource name of the GreetingEntity to delete.
   // Format:
-  // `greeting_entitys/{id}`
+  // `echo/*/greeting_entities/{name}`
   int64 id = 1;
 }
 
@@ -283,7 +283,7 @@ message DeleteGreetingEntitysResponse {
 message ImportGreetingEntityRequest {
   // Required. The name of the GreetingEntity resource.
   // Format:
-  // `/greeting_entitys`
+  // `echo/*/greeting_entities`
   string parent = 1;
 
   // Required. The desired input configs. The contents of all input configs will be
@@ -306,7 +306,7 @@ message ImportGreetingEntityResponse {
 message ExportGreetingEntityRequest {
   // Required. The name of the GreetingEntity resource.
   // Format:
-  // `/greeting_entitys`
+  // `echo/*/greeting_entities`
   string parent = 1;
 
   // Required. The desired output location.
