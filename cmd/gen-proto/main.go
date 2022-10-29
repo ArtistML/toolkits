@@ -20,33 +20,39 @@ const (
 )
 
 type Opt struct {
-	Output                string `json:"Output"`
-	DefaultHost           string `json:"DefaultHost"`
-	EntityHeaders         string `json:"EntityHeaders"`
-	PackageName           string `json:"PackageName"`
-	PackageVersionNo      string `required:"true" description:"Proto package version number." json:"PackageVersionNo"`
-	EntityName            string `required:"true" description:"Entity name for CRUD." json:"EntityName"`
-	EntityIdExpr          string `required:"true" json:"EntityIdExpr"`
-	EntityResourceType    string `required:"true" json:"EntityResourceType"`
-	EntityResourcePattern string `required:"true" json:"EntityResourcePattern"`
-	CapitalEntityName     string `required:"true" json:"CapitalEntityName"`
-	ParentUri             string `required:"true" json:"ParentUri"`
-	ParentUriPattern      string `required:"true" json:"ParentUriPattern"`
-	ParentUriType         string `required:"true" json:"ParentUriType"`
-	HasImportRequest      bool   `required:"true" json:"HasImportRequest"`
-	HasExportRequest      bool   `required:"true" json:"HasExportRequest"`
-	AuthImport            string `required:"true" json:"AuthImport"`
-	AuthOption            string `required:"true" json:"AuthOption"`
-	SwaggerHost           string `required:"true" json:"SwaggerHost"`
-	SwaggerUrl            string `required:"true" json:"SwaggerUrl"`
+	Output                   string `json:"Output"`
+	DefaultHost              string `json:"DefaultHost"`
+	EntityHeaders            string `json:"EntityHeaders"`
+	PackageName              string `json:"PackageName"`
+	PackageVersionNo         string `required:"true" description:"Proto package version number." json:"PackageVersionNo"`
+	EntityName               string `required:"true" description:"Entity name for CRUD." json:"EntityName"`
+	EntityResource           string `required:"true" json:"EntityResource"`
+	EntityResourceKey        string `required:"true" json:"EntityResourceKey"`
+	EntityResourceKeyPattern string `required:"true" json:"EntityResourceKeyPattern"`
+	EntityIdExpr             string `required:"true" json:"EntityIdExpr"`
+	EntityResourceType       string `required:"true" json:"EntityResourceType"`
+	EntityResourcePattern    string `required:"true" json:"EntityResourcePattern"`
+	CapitalEntityName        string `required:"true" json:"CapitalEntityName"`
+	ParentUri                string `required:"true" json:"ParentUri"`
+	ParentUriPattern         string `required:"true" json:"ParentUriPattern"`
+	HasImportRequest         bool   `required:"true" json:"HasImportRequest"`
+	HasExportRequest         bool   `required:"true" json:"HasExportRequest"`
+	AuthImport               string `required:"true" json:"AuthImport"`
+	AuthOption               string `required:"true" json:"AuthOption"`
+	SwaggerHost              string `required:"true" json:"SwaggerHost"`
+	SwaggerUrl               string `required:"true" json:"SwaggerUrl"`
 }
 
 type ApiResource struct {
-	Type       string `json:"Type"`
-	Pattern    string `json:"Pattern"`
-	Uri        string `json:"Uri"`
-	AuthImport string `json:"AuthImport"`
-	AuthOption string `json:"AuthOption"`
+	Type          string `json:"Type"`
+	Pattern       string `json:"Pattern"`
+	Uri           string `json:"Uri"`
+	Resource      string `json:"Resource"`
+	ResourceKey   string `json:"ResourceKey"`
+	AuthImport    string `json:"AuthImport"`
+	AuthOption    string `json:"AuthOption"`
+	ParentUri     string `json:"ParentUri"`
+	ParentPattern string `json:"ParentPattern"`
 }
 
 var (
@@ -133,11 +139,21 @@ func readResource(messageFile string) *ApiResource {
 	resourcePattern := strings.Trim(lines[matchFilters["pattern:"][0]], " \n\t")
 	start, end = strings.IndexAny(resourcePattern, "\""), strings.LastIndex(resourcePattern, "\"")
 	rPattern := resourcePattern[start+1 : end]
-	resourcePattern = resourcePattern[strings.IndexAny(resourcePattern, "\""):strings.LastIndex(resourcePattern, "\"")]
+	patterns := strings.Split(resourcePattern[start+1:end], "/")
+	patternSize := len(patterns)
+
 	apiResource := &ApiResource{
 		Type:    rType,
 		Pattern: rPattern,
-		Uri:     uriRegexp.ReplaceAllString(rPattern, uriReplacement),
+		Uri: uriRegexp.ReplaceAllString(
+			strings.Join(patterns[patternSize-2:patternSize], "/"),
+			uriReplacement),
+		Resource:    patterns[patternSize-2],
+		ResourceKey: strings.Trim(patterns[patternSize-1], "{}"),
+	}
+	if patternSize > 2 {
+		apiResource.ParentUri = strings.Join(patterns[0:patternSize-2], "/")
+		apiResource.ParentPattern = strings.Join(patterns[0:patternSize-2], "/")
 	}
 	if strings.Contains(apiResource.Uri, "{") {
 		fmt.Printf("Uri %s can't contains '{' or '}'. \n", apiResource.Uri)
@@ -192,11 +208,6 @@ func main() {
 		return
 	}
 	for _, pkgPath := range pkgPaths {
-		parentResource := readResource(path.Join(pkgPath, "common_resources.proto"))
-		if parentResource == nil {
-			fmt.Println("common_resources.proto must contains google.api.resource_definition")
-			os.Exit(1)
-		}
 		pkgName := path.Base(path.Dir(pkgPath))
 		err = filepath.Walk(pkgPath, func(walkPath string, info os.FileInfo, err error) error {
 			if info.IsDir() {
@@ -226,11 +237,6 @@ func main() {
 			entityResource := readResource(walkPath)
 			if entityResource == nil {
 				entityResource = &ApiResource{}
-			} else {
-				if !strings.HasPrefix(entityResource.Pattern, parentResource.Pattern) {
-					fmt.Printf("Resource %s of entity should start with parent's resource %s!\n", entityResource.Pattern, parentResource.Pattern)
-					os.Exit(1)
-				}
 			}
 			capitalEntityName := getCapitalEntityName(entityName)
 			importConfigName, exportConfigName := fmt.Sprintf("Import%sConfig", capitalEntityName), fmt.Sprintf("Export%sConfig", capitalEntityName)
@@ -241,22 +247,24 @@ func main() {
 			_, hasExportRequest := matchFilters[exportConfigName]
 			optList = append(optList, Opt{
 				Output: pkgPath, DefaultHost: opts.DefaultHost, EntityHeaders: headers,
-				PackageName:           pkgName,
-				PackageVersionNo:      path.Base(pkgPath)[1:],
-				EntityName:            entityName,
-				EntityIdExpr:          fmt.Sprintf("{%s.id=*}", entityName),
-				EntityResourceType:    entityResource.Type,
-				EntityResourcePattern: entityResource.Pattern,
-				CapitalEntityName:     capitalEntityName,
-				ParentUri:             parentResource.Uri,
-				ParentUriPattern:      parentResource.Pattern,
-				ParentUriType:         parentResource.Type,
-				HasImportRequest:      hasImportRequest,
-				HasExportRequest:      hasExportRequest,
-				AuthImport:            entityResource.AuthImport,
-				AuthOption:            entityResource.AuthOption,
-				SwaggerHost:           opts.SwaggerHost,
-				SwaggerUrl:            opts.SwaggerUrl,
+				PackageName:              pkgName,
+				PackageVersionNo:         path.Base(pkgPath)[1:],
+				EntityName:               entityName,
+				EntityResource:           entityResource.Resource,
+				EntityResourceKey:        entityResource.ResourceKey,
+				EntityResourceKeyPattern: fmt.Sprintf("{%s=*}", entityResource.ResourceKey),
+				EntityIdExpr:             fmt.Sprintf("{%s.%s=*}", entityName, entityResource.ResourceKey),
+				EntityResourceType:       entityResource.Type,
+				EntityResourcePattern:    entityResource.Pattern,
+				CapitalEntityName:        capitalEntityName,
+				ParentUri:                entityResource.ParentUri,
+				ParentUriPattern:         entityResource.ParentPattern,
+				HasImportRequest:         hasImportRequest,
+				HasExportRequest:         hasExportRequest,
+				AuthImport:               entityResource.AuthImport,
+				AuthOption:               entityResource.AuthOption,
+				SwaggerHost:              opts.SwaggerHost,
+				SwaggerUrl:               opts.SwaggerUrl,
 			})
 			return nil
 		})

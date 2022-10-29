@@ -13,7 +13,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     version : "{{.PackageVersionNo}}.0"
     contact : {
       name : "{{.CapitalEntityName}} Service"
-      url : "http://{{.DefaultHost}}/{{.ParentUriPattern}}"
+      url : "http://{{.DefaultHost}}"
     }
   }
   host : "{{.SwaggerHost}}"
@@ -37,7 +37,7 @@ service {{.CapitalEntityName}}Service {
       returns (Create{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      post : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityName}}s"
+      post : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}"
       body : "{{.EntityName}}"
     };
     option (google.api.method_signature) = "parent,{{.EntityName}}";{{end}}
@@ -48,9 +48,9 @@ service {{.CapitalEntityName}}Service {
       returns (Get{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      get : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityName}}s/{id=*}"
+      get : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityResource}}/{{.EntityResourceKeyPattern}}"
     };
-    option (google.api.method_signature) = "id";{{end}}
+    option (google.api.method_signature) = "{{.EntityResourceKey}}";{{end}}
   }
 
   // Updates a {{.CapitalEntityName}}.
@@ -58,7 +58,7 @@ service {{.CapitalEntityName}}Service {
       returns (Update{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      patch : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityName}}s/{{.EntityIdExpr}}"
+      patch : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityResource}}/{{.EntityIdExpr}}"
       body : "{{.EntityName}}"
     };
     option (google.api.method_signature) = "{{.EntityName}},update_mask";{{end}}
@@ -69,7 +69,7 @@ service {{.CapitalEntityName}}Service {
       returns (List{{.CapitalEntityName}}sResponse) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      get : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityName}}s"
+      get : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}"
     };
     option (google.api.method_signature) = "parent";{{end}}
   }
@@ -79,9 +79,9 @@ service {{.CapitalEntityName}}Service {
       returns (Delete{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      delete : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityName}}s/{id=*}"
+      delete : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityResource}}/{{.EntityResourceKeyPattern}}"
     };
-    option (google.api.method_signature) = "id";{{end}}
+    option (google.api.method_signature) = "{{.EntityResourceKey}}";{{end}}
   }
 
   // Batch delete {{.CapitalEntityName}} by filter.
@@ -89,7 +89,7 @@ service {{.CapitalEntityName}}Service {
       returns (Delete{{.CapitalEntityName}}sResponse) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      patch : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityName}}s"
+      patch : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityResource}}"
       body : "*"
     };{{end}}
   }
@@ -99,7 +99,7 @@ service {{.CapitalEntityName}}Service {
       returns (Import{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      post : "/v{{.PackageVersionNo}}/{parent={{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityName}}s}:import"
+      post : "/v{{.PackageVersionNo}}/{parent={{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityResource}}}:import"
       body : "*"
     };
     option (google.api.method_signature) = "parent,import_configs";{{end}}
@@ -110,7 +110,7 @@ service {{.CapitalEntityName}}Service {
       returns (Export{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      post : "/v{{.PackageVersionNo}}/{parent={{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityName}}s}:export"
+      post : "/v{{.PackageVersionNo}}/{parent={{if .ParentUri}}{{.ParentUri}}/{{end}}{{.EntityResource}}}:export"
       body : "*"
     };
     option (google.api.method_signature) = "parent,export_config";{{end}}
@@ -279,7 +279,7 @@ message Delete{{.CapitalEntityName}}sResponse {
 message Import{{.CapitalEntityName}}Request {
   // Required. The name of the {{.CapitalEntityName}} resource.
   // Format:
-  // `{{.ParentUriPattern}}/{{.EntityName}}s`
+  // `{{.ParentUriPattern}}/{{.EntityResource}}`
   string parent = 1;
 
   // Required. The desired input configs. The contents of all input configs will be
@@ -302,7 +302,7 @@ message Import{{.CapitalEntityName}}Response {
 message Export{{.CapitalEntityName}}Request {
   // Required. The name of the {{.CapitalEntityName}} resource.
   // Format:
-  // `{{.ParentUriPattern}}/{{.EntityName}}s`
+  // `{{.ParentUriPattern}}/{{.EntityResource}}`
   string parent = 1;
 
   // Required. The desired output location.
