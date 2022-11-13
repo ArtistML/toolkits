@@ -26,3 +26,5 @@ message GreetingFilter {
 message GreetingListOption {}
 
 message ImportGreetingConfig { string file_path = 1; }
+
+message ExportGreetingConfig { string file_path = 1; }

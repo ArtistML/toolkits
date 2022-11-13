@@ -7,7 +7,6 @@ import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/protobuf/field_mask.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
-
 import "auth/v1/options.proto";
 import "echo/v1/greeting_entity.proto";
 
@@ -52,7 +51,7 @@ service GreetingEntityService {
       returns (GetGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      get : "/v1/echo/*/greeting_entities/{name=*}"
+      get : "/v1/{parent=echo/*}/greeting_entities/{name=*}"
     };
     option (google.api.method_signature) = "name";
   }
@@ -62,7 +61,7 @@ service GreetingEntityService {
       returns (UpdateGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      patch : "/v1/echo/*/greeting_entities/{greeting_entity.name=*}"
+      patch : "/v1/{parent=echo/*}/greeting_entities/{greeting_entity.name=*}"
       body : "greeting_entity"
     };
     option (google.api.method_signature) = "greeting_entity,update_mask";
@@ -73,9 +72,8 @@ service GreetingEntityService {
       returns (ListGreetingEntitysResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      get : "/v1/{parent=echo/*}/greeting_entities"
+      get : "/v1/greeting_entities"
     };
-    option (google.api.method_signature) = "parent";
   }
 
   // Deletes a GreetingEntity.
@@ -83,7 +81,7 @@ service GreetingEntityService {
       returns (DeleteGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      delete : "/v1/echo/*/greeting_entities/{name=*}"
+      delete : "/v1/{parent=echo/*}/greeting_entities/{name=*}"
     };
     option (google.api.method_signature) = "name";
   }
@@ -93,7 +91,7 @@ service GreetingEntityService {
       returns (DeleteGreetingEntitysResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      patch : "/v1/echo/*/greeting_entities"
+      patch : "/v1/greeting_entities"
       body : "*"
     };
   }
@@ -103,10 +101,9 @@ service GreetingEntityService {
       returns (ImportGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      post : "/v1/{parent=echo/*/greeting_entities}:import"
+      post : "/v1/greeting_entities:import"
       body : "*"
     };
-    option (google.api.method_signature) = "parent,import_configs";
   }
 
   // Exports a GreetingEntity.
@@ -114,16 +111,15 @@ service GreetingEntityService {
       returns (ExportGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      post : "/v1/{parent=echo/*/greeting_entities}:export"
+      post : "/v1/greeting_entities:export"
       body : "*"
     };
-    option (google.api.method_signature) = "parent,export_config";
   }
 }
 
 // Request message for [GreetingEntityService.CreateGreetingEntity][v1.GreetingEntityService.CreateGreetingEntity].
 message CreateGreetingEntityRequest {
-  // Required. The resource name of the ParentUri to create the GreetingEntity in.
+  // The path of the GreetingEntity's parent resource, if exists.
   // Format : `echo/*`
   string parent = 1;
 
@@ -143,11 +139,15 @@ message CreateGreetingEntityResponse {
 
 // Request message for [GreetingEntityService.GetGreetingEntity][v1.GreetingEntityService.GetGreetingEntity].
 message GetGreetingEntityRequest {
+  // The path of the GreetingEntity's parent resource, if exists.
+  // Format : `echo/*`
+  string parent = 1;
+
   // Required. The id of the GreetingEntity in database.
-  int64 id = 1;
+  int64 id = 2;
 
   // Mask specifying which fields to read.
-  google.protobuf.FieldMask read_mask = 2;
+  google.protobuf.FieldMask read_mask = 3;
 }
 
 // Response message for [GreetingEntityService.GetGreetingEntity][v1.GreetingEntityService.GetGreetingEntity].
@@ -162,8 +162,12 @@ message GetGreetingEntityResponse {
 
 // Request message for [GreetingEntityService.UpdateGreetingEntity][v1.GreetingEntityService.UpdateGreetingEntity].
 message UpdateGreetingEntityRequest {
+  // The path of the GreetingEntity's parent resource, if exists.
+  // Format : `echo/*`
+  string parent = 1;
+
   // Required. The GreetingEntity which replaces the resource on the server.
-  GreetingEntity greeting_entity = 1;
+  GreetingEntity greeting_entity = 2;
 
   // Required. The update mask applies to the resource.
   // For the `FieldMask` definition, see [google.protobuf.FieldMask][google.protobuf.FieldMask].
@@ -172,7 +176,7 @@ message UpdateGreetingEntityRequest {
   //   * `id`
   //   * `update_at`
   //   * `create_at`
-  google.protobuf.FieldMask update_mask = 2;
+  google.protobuf.FieldMask update_mask = 3;
 }
 
 // Response message for [GreetingEntityService.UpdateGreetingEntity][v1.GreetingEntityService.UpdateGreetingEntity].
@@ -187,40 +191,36 @@ message UpdateGreetingEntityResponse {
 
 // Request message for [GreetingEntityService.ListGreetingEntitys][v1.GreetingEntityService.ListGreetingEntitys].
 message ListGreetingEntitysRequest {
-  // Required. The name of the GreetingEntity's parent resource.
-  // Format : `echo/*`
-  string parent = 1;
-
   // The standard page number, start with zero, use cursor or size as page rotation.
-  int32 page = 2;
+  int32 page = 1;
 
   // The standard list page size.
-  int32 size = 3;
+  int32 size = 2;
 
   // The standard list page cursor.
-  string cursor = 4;
+  string cursor = 3;
 
   // The search keyword.
-  string query = 5;
+  string query = 4;
 
   // Mask specifying which fields to read.
-  google.protobuf.FieldMask read_mask = 6;
+  google.protobuf.FieldMask read_mask = 5;
 
   // A comma-separated list of fields to order by, sorted in ascending order.
   // Use "desc" after a field name for descending.
   // Supported fields:
   //   * `create_at`
   //   * `update_at`
-  string order_by = 7;
+  string order_by = 6;
 
   // A comma-separated list of fields to group by
-  string group_by = 8;
+  string group_by = 7;
 
   // filter struct for list.
-  GreetingEntityFilter f = 9;
+  GreetingEntityFilter f = 8;
 
   // option struct for list.
-  GreetingEntityListOption o = 10;
+  GreetingEntityListOption o = 9;
 }
 
 // Response message for [GreetingEntityService.ListGreetingEntitys][v1.GreetingEntityService.ListGreetingEntitys].
@@ -246,10 +246,14 @@ message ListGreetingEntitysResponse {
 
 // Request message for [GreetingEntityService.DeleteGreetingEntity][v1.GreetingEntityService.DeleteGreetingEntity].
 message DeleteGreetingEntityRequest {
+  // The path of the GreetingEntity's parent resource, if exists.
+  // Format : `echo/*`
+  string parent = 1;
+
   // Required. The resource name of the GreetingEntity to delete.
   // Format:
   // `echo/*/greeting_entities/{name}`
-  int64 id = 1;
+  int64 id = 2;
 }
 
 // Response message for [GreetingEntityService.DeleteGreetingEntity][v1.GreetingEntityService.DeleteGreetingEntity].
@@ -277,18 +281,11 @@ message DeleteGreetingEntitysResponse {
   // deleted id list.
   repeated int64 details = 3;
 }
-
-
 // Request message for [GreetingEntityService.ImportGreetingEntity][v1.GreetingEntityService.ImportGreetingEntity].
 message ImportGreetingEntityRequest {
-  // Required. The name of the GreetingEntity resource.
-  // Format:
-  // `echo/*/greeting_entities`
-  string parent = 1;
-
   // Required. The desired input configs. The contents of all input configs will be
   // imported in one batch.
-  repeated ImportGreetingEntityConfig import_configs = 2;
+  repeated ImportGreetingEntityConfig import_configs = 1;
 }
 
 // Response message for [GreetingEntityService.ImportGreetingEntity][v1.GreetingEntityService.ImportGreetingEntity].
@@ -300,17 +297,10 @@ message ImportGreetingEntityResponse {
   // success or fail.
   bool details = 3;
 }
-
-
 // Request message for [GreetingEntityService.ExportGreetingEntity][v1.GreetingEntityService.ExportGreetingEntity].
 message ExportGreetingEntityRequest {
-  // Required. The name of the GreetingEntity resource.
-  // Format:
-  // `echo/*/greeting_entities`
-  string parent = 1;
-
   // Required. The desired output location.
-  ExportGreetingEntityConfig export_config = 2;
+  ExportGreetingEntityConfig export_config = 1;
 }
 
 // Response message for [GreetingEntityService.ExportGreetingEntity][v1.GreetingEntityService.ExportGreetingEntity].
