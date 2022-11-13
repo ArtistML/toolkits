@@ -8,7 +8,6 @@ import "google/api/client.proto";
 import "google/protobuf/field_mask.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-
 import "echo/v2/greeting.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
@@ -78,11 +77,16 @@ service GreetingService {
 
   }
 
+  // Exports a Greeting.
+  rpc ExportGreeting(ExportGreetingRequest)
+      returns (ExportGreetingResponse) {
+
+  }
 }
 
 // Request message for [GreetingService.CreateGreeting][v2.GreetingService.CreateGreeting].
 message CreateGreetingRequest {
-  // Required. The resource name of the ParentUri to create the Greeting in.
+  // The path of the Greeting's parent resource, if exists.
   // Format : ``
   string parent = 1;
 
@@ -102,11 +106,15 @@ message CreateGreetingResponse {
 
 // Request message for [GreetingService.GetGreeting][v2.GreetingService.GetGreeting].
 message GetGreetingRequest {
+  // The path of the Greeting's parent resource, if exists.
+  // Format : ``
+  string parent = 1;
+
   // Required. The id of the Greeting in database.
-  int64 id = 1;
+  int64 id = 2;
 
   // Mask specifying which fields to read.
-  google.protobuf.FieldMask read_mask = 2;
+  google.protobuf.FieldMask read_mask = 3;
 }
 
 // Response message for [GreetingService.GetGreeting][v2.GreetingService.GetGreeting].
@@ -121,8 +129,12 @@ message GetGreetingResponse {
 
 // Request message for [GreetingService.UpdateGreeting][v2.GreetingService.UpdateGreeting].
 message UpdateGreetingRequest {
+  // The path of the Greeting's parent resource, if exists.
+  // Format : ``
+  string parent = 1;
+
   // Required. The Greeting which replaces the resource on the server.
-  Greeting greeting = 1;
+  Greeting greeting = 2;
 
   // Required. The update mask applies to the resource.
   // For the `FieldMask` definition, see [google.protobuf.FieldMask][google.protobuf.FieldMask].
@@ -131,7 +143,7 @@ message UpdateGreetingRequest {
   //   * `id`
   //   * `update_at`
   //   * `create_at`
-  google.protobuf.FieldMask update_mask = 2;
+  google.protobuf.FieldMask update_mask = 3;
 }
 
 // Response message for [GreetingService.UpdateGreeting][v2.GreetingService.UpdateGreeting].
@@ -146,40 +158,36 @@ message UpdateGreetingResponse {
 
 // Request message for [GreetingService.ListGreetings][v2.GreetingService.ListGreetings].
 message ListGreetingsRequest {
-  // Required. The name of the Greeting's parent resource.
-  // Format : ``
-  string parent = 1;
-
   // The standard page number, start with zero, use cursor or size as page rotation.
-  int32 page = 2;
+  int32 page = 1;
 
   // The standard list page size.
-  int32 size = 3;
+  int32 size = 2;
 
   // The standard list page cursor.
-  string cursor = 4;
+  string cursor = 3;
 
   // The search keyword.
-  string query = 5;
+  string query = 4;
 
   // Mask specifying which fields to read.
-  google.protobuf.FieldMask read_mask = 6;
+  google.protobuf.FieldMask read_mask = 5;
 
   // A comma-separated list of fields to order by, sorted in ascending order.
   // Use "desc" after a field name for descending.
   // Supported fields:
   //   * `create_at`
   //   * `update_at`
-  string order_by = 7;
+  string order_by = 6;
 
   // A comma-separated list of fields to group by
-  string group_by = 8;
+  string group_by = 7;
 
   // filter struct for list.
-  GreetingFilter f = 9;
+  GreetingFilter f = 8;
 
   // option struct for list.
-  GreetingListOption o = 10;
+  GreetingListOption o = 9;
 }
 
 // Response message for [GreetingService.ListGreetings][v2.GreetingService.ListGreetings].
@@ -205,10 +213,14 @@ message ListGreetingsResponse {
 
 // Request message for [GreetingService.DeleteGreeting][v2.GreetingService.DeleteGreeting].
 message DeleteGreetingRequest {
+  // The path of the Greeting's parent resource, if exists.
+  // Format : ``
+  string parent = 1;
+
   // Required. The resource name of the Greeting to delete.
   // Format:
   // ``
-  int64 id = 1;
+  int64 id = 2;
 }
 
 // Response message for [GreetingService.DeleteGreeting][v2.GreetingService.DeleteGreeting].
@@ -236,18 +248,11 @@ message DeleteGreetingsResponse {
   // deleted id list.
   repeated int64 details = 3;
 }
-
-
 // Request message for [GreetingService.ImportGreeting][v2.GreetingService.ImportGreeting].
 message ImportGreetingRequest {
-  // Required. The name of the Greeting resource.
-  // Format:
-  // `/`
-  string parent = 1;
-
   // Required. The desired input configs. The contents of all input configs will be
   // imported in one batch.
-  repeated ImportGreetingConfig import_configs = 2;
+  repeated ImportGreetingConfig import_configs = 1;
 }
 
 // Response message for [GreetingService.ImportGreeting][v2.GreetingService.ImportGreeting].
@@ -259,5 +264,18 @@ message ImportGreetingResponse {
   // success or fail.
   bool details = 3;
 }
+// Request message for [GreetingService.ExportGreeting][v2.GreetingService.ExportGreeting].
+message ExportGreetingRequest {
+  // Required. The desired output location.
+  ExportGreetingConfig export_config = 1;
+}
 
-
+// Response message for [GreetingService.ExportGreeting][v2.GreetingService.ExportGreeting].
+message ExportGreetingResponse {
+  // status code.
+  int32 code = 1;
+  // error message.
+  string message = 2;
+  // All of the files that are exported in this export operation.
+  repeated string details = 3;
+}

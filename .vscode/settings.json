@@ -1,0 +1,14 @@
+{
+    "makefile.extensionOutputFolder": "./.vscode",
+    "go.toolsEnvVars": {
+        "GONOPROXY": "http://goproxy.cn",
+        "GONOSUMDB": "off",
+        "GOPRIVATE": "",
+        "GOPROXY": "http://goproxy.cn,direct",
+        "GOSUMDB": "off",
+        "GOTMPDIR": "/tmp/go",
+        "GOVERSION": "go1.18.3",
+        "GOMOD": "./go.mod",
+        "GOWORK": ""
+    }
+}
