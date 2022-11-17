@@ -225,10 +225,6 @@ func main() {
 			items := strings.Split(path.Base(walkPath), ".")
 			entityName := items[0]
 			suffix := items[1]
-			if pkgName == entityName {
-				// 对于与 model 同名的 entity，认为是自定义的服务，不需要再生成 service
-				return nil
-			}
 			if suffix == "auth" {
 				// 对于 {entity}.auth 这样用于 {entity} 登录验证所使用的配置，不需要生成 service
 				return nil
