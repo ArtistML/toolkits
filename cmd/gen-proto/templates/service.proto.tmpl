@@ -49,7 +49,7 @@ service {{.CapitalEntityName}}Service {
     option (google.api.http) = {
       get : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}/{{.EntityResourceKeyPattern}}"
     };
-    option (google.api.method_signature) = "{{.EntityResourceKey}}";{{end}}
+    option (google.api.method_signature) = "parent,{{.EntityResourceKey}}";{{end}}
   }
 
   // Updates a {{.CapitalEntityName}}.
@@ -60,7 +60,7 @@ service {{.CapitalEntityName}}Service {
       patch : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}/{{.EntityIdExpr}}"
       body : "{{.EntityName}}"
     };
-    option (google.api.method_signature) = "{{.EntityName}},update_mask";{{end}}
+    option (google.api.method_signature) = "parent,{{.EntityName}},update_mask";{{end}}
   }
 
   // Lists {{.CapitalEntityName}}s in a Location.
@@ -68,8 +68,9 @@ service {{.CapitalEntityName}}Service {
       returns (List{{.CapitalEntityName}}sResponse) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      get : "/v{{.PackageVersionNo}}/{{.EntityResource}}"
-    };{{end}}
+      get : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}"
+    };
+    option (google.api.method_signature) = "parent";{{end}}
   }
 
   // Deletes a {{.CapitalEntityName}}.
@@ -79,7 +80,7 @@ service {{.CapitalEntityName}}Service {
     option (google.api.http) = {
       delete : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}/{{.EntityResourceKeyPattern}}"
     };
-    option (google.api.method_signature) = "{{.EntityResourceKey}}";{{end}}
+    option (google.api.method_signature) = "parent,{{.EntityResourceKey}}";{{end}}
   }
 
   // Batch delete {{.CapitalEntityName}} by filter.
@@ -87,9 +88,10 @@ service {{.CapitalEntityName}}Service {
       returns (Delete{{.CapitalEntityName}}sResponse) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      patch : "/v{{.PackageVersionNo}}/{{.EntityResource}}"
-      body : "*"
-    };{{end}}
+      patch : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}"
+      body : "f"
+    };
+    option (google.api.method_signature) = "parent,f";{{end}}
   }
 {{if .HasImportRequest}}
   // Imports a {{.CapitalEntityName}}.
@@ -97,9 +99,10 @@ service {{.CapitalEntityName}}Service {
       returns (Import{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      post : "/v{{.PackageVersionNo}}/{{.EntityResource}}:import"
-      body : "*"
-    };{{end}}
+      post : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}:import"
+      body : "import_config"
+    };
+    option (google.api.method_signature) = "parent,import_config";{{end}}
   }{{end}}
 {{if .HasExportRequest}}
   // Exports a {{.CapitalEntityName}}.
@@ -107,9 +110,10 @@ service {{.CapitalEntityName}}Service {
       returns (Export{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      post : "/v{{.PackageVersionNo}}/{{.EntityResource}}:export"
-      body : "*"
-    };{{end}}
+      post : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}:export"
+      body : "export_config"
+    };
+    option (google.api.method_signature) = "parent,export_config";{{end}}
   }{{end}}
 }
 
@@ -187,36 +191,40 @@ message Update{{.CapitalEntityName}}Response {
 
 // Request message for [{{.CapitalEntityName}}Service.List{{.CapitalEntityName}}s][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.List{{.CapitalEntityName}}s].
 message List{{.CapitalEntityName}}sRequest {
+  // The path of the {{.CapitalEntityName}}'s parent resource, if exists.
+  // Format : `{{.ParentUriPattern}}`
+  string parent = 1;
+
   // The standard page number, start with zero, use cursor or size as page rotation.
-  int32 page = 1;
+  int32 page = 2;
 
   // The standard list page size.
-  int32 size = 2;
+  int32 size = 3;
 
   // The standard list page cursor.
-  string cursor = 3;
+  string cursor = 4;
 
   // The search keyword.
-  string query = 4;
+  string query = 5;
 
   // Mask specifying which fields to read.
-  google.protobuf.FieldMask read_mask = 5;
+  google.protobuf.FieldMask read_mask = 6;
 
   // A comma-separated list of fields to order by, sorted in ascending order.
   // Use "desc" after a field name for descending.
   // Supported fields:
   //   * `create_at`
   //   * `update_at`
-  string order_by = 6;
+  string order_by = 7;
 
   // A comma-separated list of fields to group by
-  string group_by = 7;
+  string group_by = 8;
 
   // filter struct for list.
-  {{.CapitalEntityName}}Filter f = 8;
+  {{.CapitalEntityName}}Filter f = 9;
 
   // option struct for list.
-  {{.CapitalEntityName}}ListOption o = 9;
+  {{.CapitalEntityName}}ListOption o = 10;
 }
 
 // Response message for [{{.CapitalEntityName}}Service.List{{.CapitalEntityName}}s][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.List{{.CapitalEntityName}}s].
@@ -263,9 +271,12 @@ message Delete{{.CapitalEntityName}}Response {
 }
 
 // Request message for [{{.CapitalEntityName}}Service.Delete{{.CapitalEntityName}}s][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Delete{{.CapitalEntityName}}s].
-message Delete{{.CapitalEntityName}}sRequest {
+message Delete{{.CapitalEntityName}}sRequest {  // The path of the {{.CapitalEntityName}}'s parent resource, if exists.
+  // Format : `{{.ParentUriPattern}}`
+  string parent = 1;
+
   // filter struct for delete items.
-  {{.CapitalEntityName}}Filter f = 1;
+  {{.CapitalEntityName}}Filter f = 2;
 }
 
 // Response message for [{{.CapitalEntityName}}Service.Delete{{.CapitalEntityName}}s][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Delete{{.CapitalEntityName}}s].
@@ -279,9 +290,13 @@ message Delete{{.CapitalEntityName}}sResponse {
 }
 {{if .HasImportRequest}}// Request message for [{{.CapitalEntityName}}Service.Import{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Import{{.CapitalEntityName}}].
 message Import{{.CapitalEntityName}}Request {
+  // The path of the {{.CapitalEntityName}}'s parent resource, if exists.
+  // Format : `{{.ParentUriPattern}}`
+  string parent = 1;
+
   // Required. The desired input configs. The contents of all input configs will be
   // imported in one batch.
-  repeated Import{{.CapitalEntityName}}Config import_configs = 1;
+  Import{{.CapitalEntityName}}Config import_config = 2;
 }
 
 // Response message for [{{.CapitalEntityName}}Service.Import{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Import{{.CapitalEntityName}}].
@@ -295,8 +310,12 @@ message Import{{.CapitalEntityName}}Response {
 }{{end}}
 {{if .HasExportRequest}}// Request message for [{{.CapitalEntityName}}Service.Export{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Export{{.CapitalEntityName}}].
 message Export{{.CapitalEntityName}}Request {
+  // The path of the {{.CapitalEntityName}}'s parent resource, if exists.
+  // Format : `{{.ParentUriPattern}}`
+  string parent = 1;
+
   // Required. The desired output location.
-  Export{{.CapitalEntityName}}Config export_config = 1;
+  Export{{.CapitalEntityName}}Config export_config = 2;
 }
 
 // Response message for [{{.CapitalEntityName}}Service.Export{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Export{{.CapitalEntityName}}].
