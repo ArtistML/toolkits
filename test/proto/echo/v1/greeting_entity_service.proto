@@ -2,7 +2,6 @@
 syntax = "proto3";
 package echo.v1;
 option go_package = "github.com/artistml/echo/v1;echoV1";
-
 import "google/api/annotations.proto";
 import "google/api/client.proto";
 import "google/protobuf/field_mask.proto";
@@ -11,23 +10,23 @@ import "auth/v1/options.proto";
 import "echo/v1/greeting_entity.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
-  info : {
-    title : "GreetingEntity Service"
-    version : "1.0"
-    contact : {
-      name : "GreetingEntity Service"
-      url : "http://github.com/artistml/toolkits"
+  info: {
+    title: "GreetingEntity Service"
+    version: "1.0"
+    contact: {
+      name: "GreetingEntity Service"
+      url: "http://github.com/artistml/toolkits"
     }
   }
-  host : "github.com/artistml/toolkits"
-  base_path : "/echo/v1/greeting_entity"
-  schemes : HTTP
-  schemes : HTTPS
-  consumes : "application/json"
-  produces : "application/json"
-  external_docs : {
-    description : "API specification in Markdown",
-    url : "http://github.com/artistml/toolkits/echo/v1/greeting_entity"
+  host: "github.com/artistml/toolkits"
+  base_path: "/echo/v1/greeting_entity"
+  schemes: HTTP
+  schemes: HTTPS
+  consumes: "application/json"
+  produces: "application/json"
+  external_docs: {
+    description: "API specification in Markdown",
+    url: "http://github.com/artistml/toolkits/echo/v1/greeting_entity"
   }
 };
 
@@ -40,8 +39,8 @@ service GreetingEntityService {
       returns (CreateGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      post : "/v1/{parent=echo/*}/greeting_entities"
-      body : "greeting_entity"
+      post: "/v1/{parent=echo/*}/greeting_entities"
+      body: "greeting_entity"
     };
     option (google.api.method_signature) = "parent,greeting_entity";
   }
@@ -51,7 +50,7 @@ service GreetingEntityService {
       returns (GetGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      get : "/v1/{parent=echo/*}/greeting_entities/{name=*}"
+      get: "/v1/{parent=echo/*}/greeting_entities/{name=*}"
     };
     option (google.api.method_signature) = "parent,name";
   }
@@ -61,8 +60,8 @@ service GreetingEntityService {
       returns (UpdateGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      patch : "/v1/{parent=echo/*}/greeting_entities/{greeting_entity.name=*}"
-      body : "greeting_entity"
+      patch: "/v1/{parent=echo/*}/greeting_entities/{greeting_entity.name=*}"
+      body: "greeting_entity"
     };
     option (google.api.method_signature) = "parent,greeting_entity,update_mask";
   }
@@ -72,7 +71,7 @@ service GreetingEntityService {
       returns (ListGreetingEntitysResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      get : "/v1/{parent=echo/*}/greeting_entities"
+      get: "/v1/{parent=echo/*}/greeting_entities"
     };
     option (google.api.method_signature) = "parent";
   }
@@ -82,7 +81,7 @@ service GreetingEntityService {
       returns (DeleteGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      delete : "/v1/{parent=echo/*}/greeting_entities/{name=*}"
+      delete: "/v1/{parent=echo/*}/greeting_entities/{name=*}"
     };
     option (google.api.method_signature) = "parent,name";
   }
@@ -92,8 +91,8 @@ service GreetingEntityService {
       returns (DeleteGreetingEntitysResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      patch : "/v1/{parent=echo/*}/greeting_entities"
-      body : "f"
+      patch: "/v1/{parent=echo/*}/greeting_entities"
+      body: "f"
     };
     option (google.api.method_signature) = "parent,f";
   }
@@ -103,8 +102,8 @@ service GreetingEntityService {
       returns (ImportGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      post : "/v1/{parent=echo/*}/greeting_entities:import"
-      body : "import_config"
+      post: "/v1/{parent=echo/*}/greeting_entities:import"
+      body: "import_config"
     };
     option (google.api.method_signature) = "parent,import_config";
   }
@@ -114,8 +113,8 @@ service GreetingEntityService {
       returns (ExportGreetingEntityResponse) {
     option (auth.v1.auth_options) = {require_authentication: true};
     option (google.api.http) = {
-      post : "/v1/{parent=echo/*}/greeting_entities:export"
-      body : "export_config"
+      post: "/v1/{parent=echo/*}/greeting_entities:export"
+      body: "export_config"
     };
     option (google.api.method_signature) = "parent,export_config";
   }
@@ -124,7 +123,7 @@ service GreetingEntityService {
 // Request message for [GreetingEntityService.CreateGreetingEntity][v1.GreetingEntityService.CreateGreetingEntity].
 message CreateGreetingEntityRequest {
   // The path of the GreetingEntity's parent resource, if exists.
-  // Format : `echo/*`
+  // Format: `echo/*`
   string parent = 1;
 
   // Required. The GreetingEntity to create.
@@ -144,7 +143,7 @@ message CreateGreetingEntityResponse {
 // Request message for [GreetingEntityService.GetGreetingEntity][v1.GreetingEntityService.GetGreetingEntity].
 message GetGreetingEntityRequest {
   // The path of the GreetingEntity's parent resource, if exists.
-  // Format : `echo/*`
+  // Format: `echo/*`
   string parent = 1;
 
   // Required. The id of the GreetingEntity in database.
@@ -167,7 +166,7 @@ message GetGreetingEntityResponse {
 // Request message for [GreetingEntityService.UpdateGreetingEntity][v1.GreetingEntityService.UpdateGreetingEntity].
 message UpdateGreetingEntityRequest {
   // The path of the GreetingEntity's parent resource, if exists.
-  // Format : `echo/*`
+  // Format: `echo/*`
   string parent = 1;
 
   // Required. The GreetingEntity which replaces the resource on the server.
@@ -196,7 +195,7 @@ message UpdateGreetingEntityResponse {
 // Request message for [GreetingEntityService.ListGreetingEntitys][v1.GreetingEntityService.ListGreetingEntitys].
 message ListGreetingEntitysRequest {
   // The path of the GreetingEntity's parent resource, if exists.
-  // Format : `echo/*`
+  // Format: `echo/*`
   string parent = 1;
 
   // The standard page number, start with zero, use cursor or size as page rotation.
@@ -255,7 +254,7 @@ message ListGreetingEntitysResponse {
 // Request message for [GreetingEntityService.DeleteGreetingEntity][v1.GreetingEntityService.DeleteGreetingEntity].
 message DeleteGreetingEntityRequest {
   // The path of the GreetingEntity's parent resource, if exists.
-  // Format : `echo/*`
+  // Format: `echo/*`
   string parent = 1;
 
   // Required. The resource name of the GreetingEntity to delete.
@@ -275,8 +274,9 @@ message DeleteGreetingEntityResponse {
 }
 
 // Request message for [GreetingEntityService.DeleteGreetingEntitys][v1.GreetingEntityService.DeleteGreetingEntitys].
-message DeleteGreetingEntitysRequest {  // The path of the GreetingEntity's parent resource, if exists.
-  // Format : `echo/*`
+message DeleteGreetingEntitysRequest {
+  // The path of the GreetingEntity's parent resource, if exists.
+  // Format: `echo/*`
   string parent = 1;
 
   // filter struct for delete items.
@@ -295,7 +295,7 @@ message DeleteGreetingEntitysResponse {
 // Request message for [GreetingEntityService.ImportGreetingEntity][v1.GreetingEntityService.ImportGreetingEntity].
 message ImportGreetingEntityRequest {
   // The path of the GreetingEntity's parent resource, if exists.
-  // Format : `echo/*`
+  // Format: `echo/*`
   string parent = 1;
 
   // Required. The desired input configs. The contents of all input configs will be
@@ -315,7 +315,7 @@ message ImportGreetingEntityResponse {
 // Request message for [GreetingEntityService.ExportGreetingEntity][v1.GreetingEntityService.ExportGreetingEntity].
 message ExportGreetingEntityRequest {
   // The path of the GreetingEntity's parent resource, if exists.
-  // Format : `echo/*`
+  // Format: `echo/*`
   string parent = 1;
 
   // Required. The desired output location.
