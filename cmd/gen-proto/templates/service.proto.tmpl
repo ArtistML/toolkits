@@ -7,23 +7,23 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "{{.PackageName}}/v{{.PackageVersionNo}}/{{.EntityName}}.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
-  info : {
-    title : "{{.CapitalEntityName}} Service"
-    version : "{{.PackageVersionNo}}.0"
-    contact : {
-      name : "{{.CapitalEntityName}} Service"
-      url : "http://{{.DefaultHost}}"
+  info: {
+    title: "{{.CapitalEntityName}} Service"
+    version: "{{.PackageVersionNo}}.0"
+    contact: {
+      name: "{{.CapitalEntityName}} Service"
+      url: "http://{{.DefaultHost}}"
     }
   }
-  host : "{{.SwaggerHost}}"
-  base_path : "/{{.PackageName}}/v{{.PackageVersionNo}}/{{.EntityName}}"
-  schemes : HTTP
-  schemes : HTTPS
-  consumes : "application/json"
-  produces : "application/json"
-  external_docs : {
-    description : "API specification in Markdown",
-    url : "http://{{.SwaggerUrl}}/{{.PackageName}}/v{{.PackageVersionNo}}/{{.EntityName}}"
+  host: "{{.SwaggerHost}}"
+  base_path: "/{{.PackageName}}/v{{.PackageVersionNo}}/{{.EntityName}}"
+  schemes: HTTP
+  schemes: HTTPS
+  consumes: "application/json"
+  produces: "application/json"
+  external_docs: {
+    description: "API specification in Markdown",
+    url: "http://{{.SwaggerUrl}}/{{.PackageName}}/v{{.PackageVersionNo}}/{{.EntityName}}"
   }
 };
 
@@ -36,8 +36,8 @@ service {{.CapitalEntityName}}Service {
       returns (Create{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      post : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}"
-      body : "{{.EntityName}}"
+      post: "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}"
+      body: "{{.EntityName}}"
     };
     option (google.api.method_signature) = "parent,{{.EntityName}}";{{end}}
   }
@@ -47,7 +47,7 @@ service {{.CapitalEntityName}}Service {
       returns (Get{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      get : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}/{{.EntityResourceKeyPattern}}"
+      get: "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}/{{.EntityResourceKeyPattern}}"
     };
     option (google.api.method_signature) = "parent,{{.EntityResourceKey}}";{{end}}
   }
@@ -57,8 +57,8 @@ service {{.CapitalEntityName}}Service {
       returns (Update{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      patch : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}/{{.EntityIdExpr}}"
-      body : "{{.EntityName}}"
+      patch: "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}/{{.EntityIdExpr}}"
+      body: "{{.EntityName}}"
     };
     option (google.api.method_signature) = "parent,{{.EntityName}},update_mask";{{end}}
   }
@@ -68,7 +68,7 @@ service {{.CapitalEntityName}}Service {
       returns (List{{.CapitalEntityName}}sResponse) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      get : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}"
+      get: "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}"
     };
     option (google.api.method_signature) = "parent";{{end}}
   }
@@ -78,7 +78,7 @@ service {{.CapitalEntityName}}Service {
       returns (Delete{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      delete : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}/{{.EntityResourceKeyPattern}}"
+      delete: "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}/{{.EntityResourceKeyPattern}}"
     };
     option (google.api.method_signature) = "parent,{{.EntityResourceKey}}";{{end}}
   }
@@ -88,8 +88,8 @@ service {{.CapitalEntityName}}Service {
       returns (Delete{{.CapitalEntityName}}sResponse) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      patch : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}"
-      body : "f"
+      patch: "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}"
+      body: "f"
     };
     option (google.api.method_signature) = "parent,f";{{end}}
   }
@@ -99,8 +99,8 @@ service {{.CapitalEntityName}}Service {
       returns (Import{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      post : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}:import"
-      body : "import_config"
+      post: "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}:import"
+      body: "import_config"
     };
     option (google.api.method_signature) = "parent,import_config";{{end}}
   }{{end}}
@@ -110,8 +110,8 @@ service {{.CapitalEntityName}}Service {
       returns (Export{{.CapitalEntityName}}Response) {
 {{if .EntityResourcePattern}}    {{.AuthOption}}
     option (google.api.http) = {
-      post : "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}:export"
-      body : "export_config"
+      post: "/v{{.PackageVersionNo}}/{{if .ParentUri}}{parent={{.ParentUri}}}/{{end}}{{.EntityResource}}:export"
+      body: "export_config"
     };
     option (google.api.method_signature) = "parent,export_config";{{end}}
   }{{end}}
@@ -120,7 +120,7 @@ service {{.CapitalEntityName}}Service {
 // Request message for [{{.CapitalEntityName}}Service.Create{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Create{{.CapitalEntityName}}].
 message Create{{.CapitalEntityName}}Request {
   // The path of the {{.CapitalEntityName}}'s parent resource, if exists.
-  // Format : `{{.ParentUriPattern}}`
+  // Format: `{{.ParentUriPattern}}`
   string parent = 1;
 
   // Required. The {{.CapitalEntityName}} to create.
@@ -140,7 +140,7 @@ message Create{{.CapitalEntityName}}Response {
 // Request message for [{{.CapitalEntityName}}Service.Get{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Get{{.CapitalEntityName}}].
 message Get{{.CapitalEntityName}}Request {
   // The path of the {{.CapitalEntityName}}'s parent resource, if exists.
-  // Format : `{{.ParentUriPattern}}`
+  // Format: `{{.ParentUriPattern}}`
   string parent = 1;
 
   // Required. The id of the {{.CapitalEntityName}} in database.
@@ -163,7 +163,7 @@ message Get{{.CapitalEntityName}}Response {
 // Request message for [{{.CapitalEntityName}}Service.Update{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Update{{.CapitalEntityName}}].
 message Update{{.CapitalEntityName}}Request {
   // The path of the {{.CapitalEntityName}}'s parent resource, if exists.
-  // Format : `{{.ParentUriPattern}}`
+  // Format: `{{.ParentUriPattern}}`
   string parent = 1;
 
   // Required. The {{.CapitalEntityName}} which replaces the resource on the server.
@@ -192,7 +192,7 @@ message Update{{.CapitalEntityName}}Response {
 // Request message for [{{.CapitalEntityName}}Service.List{{.CapitalEntityName}}s][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.List{{.CapitalEntityName}}s].
 message List{{.CapitalEntityName}}sRequest {
   // The path of the {{.CapitalEntityName}}'s parent resource, if exists.
-  // Format : `{{.ParentUriPattern}}`
+  // Format: `{{.ParentUriPattern}}`
   string parent = 1;
 
   // The standard page number, start with zero, use cursor or size as page rotation.
@@ -251,7 +251,7 @@ message List{{.CapitalEntityName}}sResponse {
 // Request message for [{{.CapitalEntityName}}Service.Delete{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Delete{{.CapitalEntityName}}].
 message Delete{{.CapitalEntityName}}Request {
   // The path of the {{.CapitalEntityName}}'s parent resource, if exists.
-  // Format : `{{.ParentUriPattern}}`
+  // Format: `{{.ParentUriPattern}}`
   string parent = 1;
 
   // Required. The resource name of the {{.CapitalEntityName}} to delete.
@@ -271,8 +271,9 @@ message Delete{{.CapitalEntityName}}Response {
 }
 
 // Request message for [{{.CapitalEntityName}}Service.Delete{{.CapitalEntityName}}s][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Delete{{.CapitalEntityName}}s].
-message Delete{{.CapitalEntityName}}sRequest {  // The path of the {{.CapitalEntityName}}'s parent resource, if exists.
-  // Format : `{{.ParentUriPattern}}`
+message Delete{{.CapitalEntityName}}sRequest {
+  // The path of the {{.CapitalEntityName}}'s parent resource, if exists.
+  // Format: `{{.ParentUriPattern}}`
   string parent = 1;
 
   // filter struct for delete items.
@@ -291,7 +292,7 @@ message Delete{{.CapitalEntityName}}sResponse {
 {{if .HasImportRequest}}// Request message for [{{.CapitalEntityName}}Service.Import{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Import{{.CapitalEntityName}}].
 message Import{{.CapitalEntityName}}Request {
   // The path of the {{.CapitalEntityName}}'s parent resource, if exists.
-  // Format : `{{.ParentUriPattern}}`
+  // Format: `{{.ParentUriPattern}}`
   string parent = 1;
 
   // Required. The desired input configs. The contents of all input configs will be
@@ -311,7 +312,7 @@ message Import{{.CapitalEntityName}}Response {
 {{if .HasExportRequest}}// Request message for [{{.CapitalEntityName}}Service.Export{{.CapitalEntityName}}][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.Export{{.CapitalEntityName}}].
 message Export{{.CapitalEntityName}}Request {
   // The path of the {{.CapitalEntityName}}'s parent resource, if exists.
-  // Format : `{{.ParentUriPattern}}`
+  // Format: `{{.ParentUriPattern}}`
   string parent = 1;
 
   // Required. The desired output location.

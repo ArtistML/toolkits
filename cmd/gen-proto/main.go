@@ -75,7 +75,12 @@ var (
 		"types.proto":            true,
 		"enums.proto":            true,
 	}
-	wordRegexp = regexp.MustCompile(`[a-zA-Z][a-zA-Z\d]*`)
+	wordRegexp     = regexp.MustCompile(`[a-zA-Z][a-zA-Z\d]*`)
+	headerPrefixes = []string{
+		"syntax =",
+		"package ",
+		"option go_package",
+	}
 )
 
 func checkErr(err error) {
@@ -236,13 +241,21 @@ func main() {
 			}
 			capitalEntityName := getCapitalEntityName(entityName)
 			importConfigName, exportConfigName := fmt.Sprintf("Import%sConfig", capitalEntityName), fmt.Sprintf("Export%sConfig", capitalEntityName)
-			lines, matchFilters := readLines(walkPath, map[string]string{"import": "import", importConfigName: importConfigName, exportConfigName: exportConfigName})
-			i := matchFilters["import"][0]
-			headers := strings.Join(lines[:i], "\n")
+			filters := map[string]string{"package": "headers", "syntax": "headers", importConfigName: importConfigName, exportConfigName: exportConfigName}
+			lines, matchFilters := readLines(walkPath, filters)
+			var headers []string
+			for _, i := range matchFilters["headers"] {
+				for _, filter := range headerPrefixes {
+					if strings.HasPrefix(lines[i], filter) {
+						headers = append(headers, lines[i])
+						break
+					}
+				}
+			}
 			_, hasImportRequest := matchFilters[importConfigName]
 			_, hasExportRequest := matchFilters[exportConfigName]
 			optList = append(optList, Opt{
-				Output: pkgPath, DefaultHost: opts.DefaultHost, EntityHeaders: headers,
+				Output: pkgPath, DefaultHost: opts.DefaultHost, EntityHeaders: strings.Join(headers, "\n"),
 				PackageName:              pkgName,
 				PackageVersionNo:         path.Base(pkgPath)[1:],
 				EntityName:               entityName,
