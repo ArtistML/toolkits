@@ -176,7 +176,7 @@ func main() {
 	checkErr(err)
 
 	var pkgPaths []string
-	err = filepath.Walk(rootPath, func(walkPath string, info os.FileInfo, err error) error {
+	err = filepath.Walk(rootPath, func(walkPath string, info os.FileInfo, _ error) error {
 		fmt.Printf("rootPath: %s, walkPath: %s.\n", rootPath, walkPath)
 		if !info.IsDir() {
 			return nil
@@ -209,7 +209,7 @@ func main() {
 	}
 	for _, pkgPath := range pkgPaths {
 		pkgName := path.Base(path.Dir(pkgPath))
-		err = filepath.Walk(pkgPath, func(walkPath string, info os.FileInfo, err error) error {
+		err = filepath.Walk(pkgPath, func(walkPath string, info os.FileInfo, _ error) error {
 			if info.IsDir() {
 				return nil
 			}

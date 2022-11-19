@@ -158,36 +158,40 @@ message UpdateGreetingResponse {
 
 // Request message for [GreetingService.ListGreetings][v2.GreetingService.ListGreetings].
 message ListGreetingsRequest {
+  // The path of the Greeting's parent resource, if exists.
+  // Format : ``
+  string parent = 1;
+
   // The standard page number, start with zero, use cursor or size as page rotation.
-  int32 page = 1;
+  int32 page = 2;
 
   // The standard list page size.
-  int32 size = 2;
+  int32 size = 3;
 
   // The standard list page cursor.
-  string cursor = 3;
+  string cursor = 4;
 
   // The search keyword.
-  string query = 4;
+  string query = 5;
 
   // Mask specifying which fields to read.
-  google.protobuf.FieldMask read_mask = 5;
+  google.protobuf.FieldMask read_mask = 6;
 
   // A comma-separated list of fields to order by, sorted in ascending order.
   // Use "desc" after a field name for descending.
   // Supported fields:
   //   * `create_at`
   //   * `update_at`
-  string order_by = 6;
+  string order_by = 7;
 
   // A comma-separated list of fields to group by
-  string group_by = 7;
+  string group_by = 8;
 
   // filter struct for list.
-  GreetingFilter f = 8;
+  GreetingFilter f = 9;
 
   // option struct for list.
-  GreetingListOption o = 9;
+  GreetingListOption o = 10;
 }
 
 // Response message for [GreetingService.ListGreetings][v2.GreetingService.ListGreetings].
@@ -234,9 +238,12 @@ message DeleteGreetingResponse {
 }
 
 // Request message for [GreetingService.DeleteGreetings][v2.GreetingService.DeleteGreetings].
-message DeleteGreetingsRequest {
+message DeleteGreetingsRequest {  // The path of the Greeting's parent resource, if exists.
+  // Format : ``
+  string parent = 1;
+
   // filter struct for delete items.
-  GreetingFilter f = 1;
+  GreetingFilter f = 2;
 }
 
 // Response message for [GreetingService.DeleteGreetings][v2.GreetingService.DeleteGreetings].
@@ -250,9 +257,13 @@ message DeleteGreetingsResponse {
 }
 // Request message for [GreetingService.ImportGreeting][v2.GreetingService.ImportGreeting].
 message ImportGreetingRequest {
+  // The path of the Greeting's parent resource, if exists.
+  // Format : ``
+  string parent = 1;
+
   // Required. The desired input configs. The contents of all input configs will be
   // imported in one batch.
-  repeated ImportGreetingConfig import_configs = 1;
+  ImportGreetingConfig import_config = 2;
 }
 
 // Response message for [GreetingService.ImportGreeting][v2.GreetingService.ImportGreeting].
@@ -266,8 +277,12 @@ message ImportGreetingResponse {
 }
 // Request message for [GreetingService.ExportGreeting][v2.GreetingService.ExportGreeting].
 message ExportGreetingRequest {
+  // The path of the Greeting's parent resource, if exists.
+  // Format : ``
+  string parent = 1;
+
   // Required. The desired output location.
-  ExportGreetingConfig export_config = 1;
+  ExportGreetingConfig export_config = 2;
 }
 
 // Response message for [GreetingService.ExportGreeting][v2.GreetingService.ExportGreeting].
