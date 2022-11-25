@@ -228,6 +228,9 @@ message ListGreetingEntitysRequest {
 
   // option struct for list.
   GreetingEntityListOption o = 10;
+
+  // exclude ids for this request, filled by ListGreetingEntitysResponse.
+  repeated int64 exclude_ids = 11;
 }
 
 // Response message for [GreetingEntityService.ListGreetingEntitys][v1.GreetingEntityService.ListGreetingEntitys].
@@ -239,14 +242,10 @@ message ListGreetingEntitysResponse {
   message Details {
     // A list of GreetingEntitys that matches the specified filter in the request.
     repeated GreetingEntity items = 1;
-    // next page number.
-    int32 next_page = 2;
-    // next page size.
-    int32 next_size = 3;
-    // next page cursor.
-    string next_cursor = 4;
+    // next request.
+    ListGreetingEntitysRequest next_request = 2;
     // total items count of this filter.
-    int32 total_count = 5;
+    int32 total_count = 3;
   }
   Details details = 3;
 }

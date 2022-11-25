@@ -191,6 +191,9 @@ message ListGreetingsRequest {
 
   // option struct for list.
   GreetingListOption o = 10;
+
+  // exclude ids for this request, filled by ListGreetingsResponse.
+  repeated int64 exclude_ids = 11;
 }
 
 // Response message for [GreetingService.ListGreetings][v2.GreetingService.ListGreetings].
@@ -202,14 +205,10 @@ message ListGreetingsResponse {
   message Details {
     // A list of Greetings that matches the specified filter in the request.
     repeated Greeting items = 1;
-    // next page number.
-    int32 next_page = 2;
-    // next page size.
-    int32 next_size = 3;
-    // next page cursor.
-    string next_cursor = 4;
+    // next request.
+    ListGreetingsRequest next_request = 2;
     // total items count of this filter.
-    int32 total_count = 5;
+    int32 total_count = 3;
   }
   Details details = 3;
 }
