@@ -225,6 +225,9 @@ message List{{.CapitalEntityName}}sRequest {
 
   // option struct for list.
   {{.CapitalEntityName}}ListOption o = 10;
+
+  // exclude ids for this request, filled by List{{.CapitalEntityName}}sResponse.
+  repeated int64 exclude_ids = 11;
 }
 
 // Response message for [{{.CapitalEntityName}}Service.List{{.CapitalEntityName}}s][v{{.PackageVersionNo}}.{{.CapitalEntityName}}Service.List{{.CapitalEntityName}}s].
@@ -236,14 +239,10 @@ message List{{.CapitalEntityName}}sResponse {
   message Details {
     // A list of {{.CapitalEntityName}}s that matches the specified filter in the request.
     repeated {{.CapitalEntityName}} items = 1;
-    // next page number.
-    int32 next_page = 2;
-    // next page size.
-    int32 next_size = 3;
-    // next page cursor.
-    string next_cursor = 4;
+    // next request.
+    List{{.CapitalEntityName}}sRequest next_request = 2;
     // total items count of this filter.
-    int32 total_count = 5;
+    int32 total_count = 3;
   }
   Details details = 3;
 }
